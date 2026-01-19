@@ -19,7 +19,11 @@ const Navbar = () => {
   const isComplaintPage = location.pathname === "/file-a-complaint";
   const isBusinessPage = location.pathname === "/get-certified/business";
   const isNonProfitPage = location.pathname === "/get-certified/non-profit";
-  const isSolidNavbar = isCertifiedPage || isNewCompanyPage || isBlogPage || isTrustReportPage || isSLAPage || isComplaintPage || isBusinessPage || isNonProfitPage;
+  const isAboutPage = location.pathname === "/about";
+  const isContactPage = location.pathname === "/contact";
+  const isReviewsPage = location.pathname === "/reviews";
+  const isPrivacyPolicyPage = location.pathname === "/privacy-policy";
+  const isSolidNavbar = isCertifiedPage || isNewCompanyPage || isBlogPage || isTrustReportPage || isSLAPage || isComplaintPage || isBusinessPage || isNonProfitPage || isAboutPage || isContactPage || isReviewsPage || isPrivacyPolicyPage;
 
   useEffect(() => {
     const handleScroll = () => {

@@ -17,9 +17,9 @@ const Footer = () => {
                <div>
                   <h3 className="text-2xl font-semibold mb-6">About</h3>
                   <ul className="flex flex-col gap-4 text-sm text-gray-300">
-                     <li><a href="#" className="font-medium hover:text-secondary transition-colors">About Us</a></li>
-                     <li><a href="#" className="font-medium hover:text-secondary transition-colors">Contact</a></li>
-                     <li><a href="#" className="font-medium hover:text-secondary transition-colors">Blog</a></li>
+                     <li><Link to="/about" className="font-medium hover:text-secondary transition-colors">About Us</Link></li>
+                     <li><Link to="/contact" className="font-medium hover:text-secondary transition-colors">Contact Us</Link></li>
+                     <li><Link to="/blog" className="font-medium hover:text-secondary transition-colors">Blog</Link></li>
                   </ul>
                </div>
 
@@ -27,8 +27,8 @@ const Footer = () => {
                <div>
                   <h3 className="text-2xl font-semibold mb-6">Community</h3>
                   <ul className="flex flex-col gap-4 text-sm text-gray-300">
-                     <li><a href="#" className="font-medium hover:text-secondary transition-colors">Trust in reviews</a></li>
-                     <li><Link to="/register" className="font-medium hover:text-secondary transition-colors">Register</Link></li>
+                     <li><Link to="/reviews" className="font-medium hover:text-secondary transition-colors">Reviews</Link></li>
+                     <li><Link to="/register" className="font-medium hover:text-secondary transition-colors">Register Now</Link></li>
                   </ul>
                </div>
 
@@ -43,10 +43,10 @@ const Footer = () => {
             {/* Secondary Links and Copyright */}
             <div className="pt-10">
                <div className="flex flex-wrap gap-6 md:gap-10 text-sm font-semibold mb-8 px-4">
-                  <a href="#" className="hover:text-secondary text-lg font-light transition-colors">Trust Report</a>
-                  <a href="#" className="hover:text-secondary text-lg font-light transition-colors">Service Level Agreement(SLA)</a>
-                  <a href="#" className="hover:text-secondary text-lg font-light transition-colors">File A Complaint</a>
-                  <a href="#" className="hover:text-secondary text-lg font-light transition-colors">Privacy Policy</a>
+                  <Link to="/trust-report" className="hover:text-secondary text-lg font-light transition-colors">Trust Report</Link>
+                  <Link to="/service-level-agreements" className="hover:text-secondary text-lg font-light transition-colors">Service Level Agreement(SLA)</Link>
+                  <Link to="/file-a-complaint" className="hover:text-secondary text-lg font-light transition-colors">File A Complaint</Link>
+                  <Link to="/privacy-policy" className="hover:text-secondary text-lg font-light transition-colors">Privacy Policy</Link>
                </div>
                <div className="px-4 text-sm text-gray-400">
                   © 2025 Niyah, Inc. All rights reserved.

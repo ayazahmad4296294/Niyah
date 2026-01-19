@@ -1,73 +1,10 @@
+import { Link } from "react-router-dom";
 import Slider from "react-slick";
 import { FaStar, FaUser } from "react-icons/fa6";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 // Example company image (using one from assets if available, or a placeholder)
-import CompanyLogo from "../../assets/images/logo.webp";
-
-const ReviewsData = [
-   {
-      id: 1,
-      name: "kimjohn",
-      text: "nice service",
-      rating: 4,
-      company: {
-         name: "Home Tech",
-         website: "Verified Electronics Store",
-         image: CompanyLogo
-      }
-   },
-   {
-      id: 2,
-      name: "stoke",
-      text: "good service",
-      rating: 1,
-   },
-   {
-      id: 3,
-      name: "Victor",
-      text: "very helpful and verified",
-      rating: 5,
-      company: {
-         name: "Eco Living",
-         website: "Sustainable Home Decor",
-         image: CompanyLogo
-      }
-   },
-   {
-      id: 4,
-      name: "Morgan",
-      text: "excellent support team",
-      rating: 3,
-      company: {
-         name: "Safe Stay",
-         description: "Security Solutions",
-         image: CompanyLogo
-      }
-   },
-   {
-      id: 5,
-      name: "Alice",
-      text: "Impressive quality and speed",
-      rating: 4,
-      company: {
-         name: "Sky High",
-         website: "Aviation Services",
-         image: CompanyLogo
-      }
-   },
-   {
-      id: 6,
-      name: "Bob",
-      text: "Reliable and trustworthy",
-      rating: 5,
-      company: {
-         name: "Green Earth",
-         website: "Eco Friendly products",
-         image: CompanyLogo
-      }
-   },
-];
+import { ReviewsData } from "../../data/reviewData";
 
 const ReviewCard = () => {
 
@@ -108,11 +45,11 @@ const ReviewCard = () => {
             {/* Header Section */}
             <div className="flex items-center justify-between mb-6">
                <h2 className="text-2xl text-primary font-semibold inline-block">
-                  Customer Reviews For Home
+                  Customer Reviews
                </h2>
-               <button className="px-3 py-1 bg-secondary text-white rounded-full text-md">
+               <Link to="/reviews" className="px-3 py-1 bg-secondary text-white rounded-full text-md hover:bg-secondary/90 transition-colors">
                   {ReviewsData.length} Reviews
-               </button>
+               </Link>
             </div>
 
             {/* Reviews Slider */}

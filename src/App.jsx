@@ -13,6 +13,10 @@ import FileAComplaint from './pages/TrustAndTransparency/FileAComplaint'
 import Blog from './pages/Blog'
 import Business from './pages/GetCertified/Business'
 import NonProfit from './pages/GetCertified/NonProfit'
+import About from './pages/About'
+import Contact from './pages/Contact'
+import Reviews from './pages/Reviews'
+import PrivacyPolicy from './pages/PrivacyPolicy'
 
 const App = () => {
   useEffect(() => {
@@ -37,6 +41,10 @@ const App = () => {
         <Route path="/blog" element={<Blog />} />
         <Route path="/get-certified/business" element={<Business />} />
         <Route path="/get-certified/non-profit" element={<NonProfit />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/reviews" element={<Reviews />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
     </CompanyProvider>
   )

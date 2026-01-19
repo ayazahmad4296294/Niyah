@@ -55,10 +55,10 @@ const Header = () => {
 
             {/* Hero Buttons */}
             <div className='flex items-center justify-center gap-4'>
-                <Link to="/" className={buttonStyling}>
+                <Link to="/reviews" className={buttonStyling}>
                     Write a Review
                 </Link>
-                <Link to="/" className={buttonStyling}>
+                <Link to="/new-company" className={buttonStyling}>
                     Verify Your Company
                 </Link>
             </div>
