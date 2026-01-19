@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+    --color-primary: #0D1B2A;
+    --color-secondary: #D4AF37;
+    --color-text-white: #ffffff;
+    --color-text-black: #000000;
+    --font-sans: "Montserrat", sans-serif;
+}
+
+body {
+    color: var(--color-text-black);
+    font-family: var(--font-sans);
+}
+
+/* Custom AOS Animation: zoom-out-blur */
+[data-aos="zoom-out-blur"] {
+    opacity: 0;
+    filter: blur(8px);
+    transform: scale(1.1);
+    transition-property: transform, opacity, filter;
+}
+
+[data-aos="zoom-out-blur"].aos-animate {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+}
