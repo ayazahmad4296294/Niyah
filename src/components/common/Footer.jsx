@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Logo from '../../assets/images/logo.webp';
 
 const Footer = () => {
@@ -27,8 +28,7 @@ const Footer = () => {
                   <h3 className="text-2xl font-semibold mb-6">Community</h3>
                   <ul className="flex flex-col gap-4 text-sm text-gray-300">
                      <li><a href="#" className="font-medium hover:text-secondary transition-colors">Trust in reviews</a></li>
-                     <li><a href="#" className="font-medium hover:text-secondary transition-colors">Log in</a></li>
-                     <li><a href="#" className="font-medium hover:text-secondary transition-colors">Sign up</a></li>
+                     <li><Link to="/register" className="font-medium hover:text-secondary transition-colors">Register</Link></li>
                   </ul>
                </div>
 

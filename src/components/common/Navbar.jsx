@@ -16,7 +16,10 @@ const Navbar = () => {
   const isBlogPage = location.pathname === "/blog";
   const isTrustReportPage = location.pathname === "/trust-report";
   const isSLAPage = location.pathname === "/service-level-agreements";
-  const isSolidNavbar = isCertifiedPage || isNewCompanyPage || isBlogPage || isTrustReportPage || isSLAPage;
+  const isComplaintPage = location.pathname === "/file-a-complaint";
+  const isBusinessPage = location.pathname === "/get-certified/business";
+  const isNonProfitPage = location.pathname === "/get-certified/non-profit";
+  const isSolidNavbar = isCertifiedPage || isNewCompanyPage || isBlogPage || isTrustReportPage || isSLAPage || isComplaintPage || isBusinessPage || isNonProfitPage;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -86,7 +89,7 @@ const Navbar = () => {
                 </li>
                 <hr className="text-gray-200" />
                 <li>
-                  <Link to="/complaint" className="block px-3 py-2 text-xs hover:text-secondary rounded-md">
+                  <Link to="/file-a-complaint" className="block px-3 py-2 text-xs hover:text-secondary rounded-md">
                     File A Complaint
                   </Link>
                 </li>
@@ -113,22 +116,21 @@ const Navbar = () => {
               Login
             </Link>
             <div className="relative group">
-              <Link
-                to="/login"
-                className="px-4 xl:px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-full font-semibold transition-all duration-300 flex items-center gap-1 shadow-md hover:shadow-lg"
+              <div
+                className="px-4 xl:px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-full font-semibold transition-all duration-300 flex items-center gap-1 shadow-md hover:shadow-lg cursor-pointer"
               >
                 Get Certified
                 <FaCaretDown />
-              </Link>
+              </div>
               <ul className="absolute right-2 top-full mt-0 w-40 bg-white text-black shadow-xl rounded-b-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 p-2 z-50 border-t-2 border-secondary">
                 <li>
-                  <Link to="/business" className="block px-4 py-3 text-xs hover:text-secondary rounded-md">
+                  <Link to="/get-certified/business" className="block px-4 py-3 text-xs hover:text-secondary rounded-md">
                     Business
                   </Link>
                 </li>
                 <hr className="text-gray-200" />
                 <li>
-                  <Link to="/nonprofits" className="block px-4 py-3 text-xs hover:text-secondary rounded-md">
+                  <Link to="/get-certified/non-profit" className="block px-4 py-3 text-xs hover:text-secondary rounded-md">
                     Non-Profits
                   </Link>
                 </li>
@@ -199,7 +201,7 @@ const Navbar = () => {
                 <Link to="/service-level-agreements" className="py-3 text-sm text-gray-600 border-b border-gray-100" onClick={toggleMenu}>
                   Service Level Agreements
                 </Link>
-                <Link to="/complaint" className="py-3 text-sm text-gray-600 border-b border-gray-200" onClick={toggleMenu}>
+                <Link to="/file-a-complaint" className="py-3 text-sm text-gray-600 border-b border-gray-200" onClick={toggleMenu}>
                   File A Complaint
                 </Link>
               </div>
@@ -219,10 +221,10 @@ const Navbar = () => {
                 <FaCaretDown className={`transition-transform duration-300 ${activeSubmenu === 'certified' ? 'rotate-180' : ''}`} />
               </div>
               <div className={`pl-4 flex flex-col bg-gray-50 overflow-hidden transition-all duration-300 ${activeSubmenu === 'certified' ? 'max-h-40' : 'max-h-0'}`}>
-                <Link to="/business" className="py-3 text-sm text-gray-600 border-b border-gray-100" onClick={toggleMenu}>
+                <Link to="/get-certified/business" className="py-3 text-sm text-gray-600 border-b border-gray-100" onClick={toggleMenu}>
                   Business
                 </Link>
-                <Link to="/nonprofits" className="py-3 text-sm text-gray-600 border-b border-gray-100" onClick={toggleMenu}>
+                <Link to="/get-certified/non-profit" className="py-3 text-sm text-gray-600 border-b border-gray-100" onClick={toggleMenu}>
                   Non-Profits
                 </Link>
               </div>

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const AuthForm = () => {
-    const [isLogin, setIsLogin] = useState(true);
+    const location = useLocation();
+    const isRegisterPath = location.pathname === '/register';
+    const [isLogin, setIsLogin] = useState(!isRegisterPath);
 
     const toggleMode = () => {
         setIsLogin(!isLogin);
