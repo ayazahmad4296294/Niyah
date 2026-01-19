@@ -7,6 +7,13 @@ export const companiesData = [
         name: "Bruce Hopkins Co",
         description: "Est sunt nostrud asp",
         image: logo,
+        email: "contact@brucehopkins.com",
+        website: "www.brucehopkins.com",
+        phone: "+1 234 567 890",
+        address: "123 Tech Lane, Silicon Valley, CA",
+        location: { lat: 37.7749, lng: -122.4194 },
+        verificationStatus: "Verified",
+        trustScore: 4.8
     },
     {
         id: 2,
@@ -14,6 +21,13 @@ export const companiesData = [
         name: "Levine and Lancaster LLC",
         description: "Incidunt tempor qua",
         image: logo,
+        email: "info@levinelancaster.com",
+        website: "www.levinelancaster.com",
+        phone: "+1 345 678 901",
+        address: "456 Innovation Dr, Austin, TX",
+        location: { lat: 30.2672, lng: -97.7431 },
+        verificationStatus: "Verified",
+        trustScore: 4.5
     },
     {
         id: 3,
@@ -21,6 +35,13 @@ export const companiesData = [
         name: "Hill and Fisher LLC",
         description: "Similique ratione si",
         image: logo,
+        email: "hello@hillfisher.com",
+        website: "www.hillfisher.com",
+        phone: "+1 456 789 012",
+        address: "789 Future St, Seattle, WA",
+        location: { lat: 47.6062, lng: -122.3321 },
+        verificationStatus: "Pending",
+        trustScore: 3.9
     },
     {
         id: 4,
@@ -28,6 +49,13 @@ export const companiesData = [
         name: "Bartlett Horn LLC",
         description: "Aute quisquam dolore",
         image: logo,
+        email: "support@bartletthorn.com",
+        website: "www.bartletthorn.com",
+        phone: "+1 567 890 123",
+        address: "101 Code Ave, New York, NY",
+        location: { lat: 40.7128, lng: -74.0060 },
+        verificationStatus: "Verified",
+        trustScore: 4.2
     },
     {
         id: 5,
@@ -35,6 +63,13 @@ export const companiesData = [
         name: "Acme Finance Corp",
         description: "Secure and reliable finance",
         image: logo,
+        email: "info@acmefinance.com",
+        website: "www.acmefinance.com",
+        phone: "+1 678 901 234",
+        address: "202 Wall St, New York, NY",
+        location: { lat: 40.7060, lng: -74.0088 },
+        verificationStatus: "Verified",
+        trustScore: 4.9
     },
     {
         id: 6,
@@ -42,6 +77,13 @@ export const companiesData = [
         name: "HealthConnect Systems",
         description: "Modern healthcare solutions",
         image: logo,
+        email: "contact@healthconnect.com",
+        website: "www.healthconnect.com",
+        phone: "+1 789 012 345",
+        address: "303 Care Blvd, Boston, MA",
+        location: { lat: 42.3601, lng: -71.0589 },
+        verificationStatus: "Verified",
+        trustScore: 4.7
     },
     {
         id: 7,
@@ -49,6 +91,13 @@ export const companiesData = [
         name: "Urban Living Realty",
         description: "Luxury real estate experts",
         image: logo,
+        email: "sales@urbanliving.com",
+        website: "www.urbanliving.com",
+        phone: "+1 890 123 456",
+        address: "404 Estate Way, Los Angeles, CA",
+        location: { lat: 34.0522, lng: -118.2437 },
+        verificationStatus: "Pending",
+        trustScore: 4.1
     },
     {
         id: 8,
@@ -56,6 +105,13 @@ export const companiesData = [
         name: "EduBase Learning",
         description: "Innovative learning platforms",
         image: logo,
+        email: "admin@edubase.com",
+        website: "www.edubase.com",
+        phone: "+1 901 234 567",
+        address: "505 Scholar Ct, Chicago, IL",
+        location: { lat: 41.8781, lng: -87.6298 },
+        verificationStatus: "Verified",
+        trustScore: 4.6
     },
     {
         id: 9,
@@ -63,6 +119,13 @@ export const companiesData = [
         name: "Global Goods Retail",
         description: "Direct-to-consumer excellence",
         image: logo,
+        email: "orders@globalgoods.com",
+        website: "www.globalgoods.com",
+        phone: "+1 012 345 678",
+        address: "606 Retail Plaza, Miami, FL",
+        location: { lat: 25.7617, lng: -80.1918 },
+        verificationStatus: "Verified",
+        trustScore: 4.4
     },
     {
         id: 10,
@@ -70,6 +133,13 @@ export const companiesData = [
         name: "GreenEnergy Solutions",
         description: "Sustainable energy for all",
         image: logo,
+        email: "info@greenenergy.com",
+        website: "www.greenenergy.com",
+        phone: "+1 123 456 789",
+        address: "707 Solar Dr, Denver, CO",
+        location: { lat: 39.7392, lng: -104.9903 },
+        verificationStatus: "Verified",
+        trustScore: 4.9
     },
     {
         id: 11,
@@ -77,6 +147,13 @@ export const companiesData = [
         name: "Apex Digital Media",
         description: "Data-driven marketing results",
         image: logo,
+        email: "hello@apexmedia.com",
+        website: "www.apexmedia.com",
+        phone: "+1 234 567 890",
+        address: "808 Ad Way, San Francisco, CA",
+        location: { lat: 37.7749, lng: -122.4194 },
+        verificationStatus: "Verified",
+        trustScore: 4.3
     },
     {
         id: 12,
@@ -84,5 +161,12 @@ export const companiesData = [
         name: "Justice Partners LLC",
         description: "Expert legal representation",
         image: logo,
+        email: "legal@justicepartners.com",
+        website: "www.justicepartners.com",
+        phone: "+1 345 678 901",
+        address: "909 Law St, Washington, DC",
+        location: { lat: 38.9072, lng: -77.0369 },
+        verificationStatus: "Verified",
+        trustScore: 4.8
     }
 ];

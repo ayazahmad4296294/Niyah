@@ -17,6 +17,7 @@ import About from './pages/About'
 import Contact from './pages/Contact'
 import Reviews from './pages/Reviews'
 import PrivacyPolicy from './pages/PrivacyPolicy'
+import CompanyDetail from './pages/CompanyDetail'
 
 const App = () => {
   useEffect(() => {
@@ -38,6 +39,7 @@ const App = () => {
         <Route path="/trust-report" element={<TrustReport />} />
         <Route path="/service-level-agreements" element={<ServiceLevelAgreements />} />
         <Route path="/file-a-complaint" element={<FileAComplaint />} />
+        <Route path="/file-complaint/:companyId" element={<FileAComplaint />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/get-certified/business" element={<Business />} />
         <Route path="/get-certified/non-profit" element={<NonProfit />} />
@@ -45,6 +47,7 @@ const App = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/company/:companyId" element={<CompanyDetail />} />
       </Routes>
     </CompanyProvider>
   )

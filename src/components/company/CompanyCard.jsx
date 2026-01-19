@@ -11,9 +11,9 @@ const CompanyCard = ({ company, index }) => {
       data-aos="zoom-out-blur"
       data-aos-delay={index * 100}
       data-aos-duration="600"
-      className="rounded-xl overflow-hidden border-2 border-primary/20 group flex flex-col h-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105"
+      className="rounded-xl overflow-hidden border-2 border-primary/20 group flex flex-col h-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 hover:shadow-2xl cursor-pointer"
     >
-      <Link to="#" className="flex flex-col h-full">
+      <Link to={`/company/${company.id}`} className="flex flex-col h-full">
         {/* Image Container */}
         <div className="h-48 bg-white flex items-center justify-center p-8">
           <img
