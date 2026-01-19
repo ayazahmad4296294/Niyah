@@ -14,7 +14,9 @@ const Navbar = () => {
   const isCertifiedPage = location.pathname === "/certified-companies";
   const isNewCompanyPage = location.pathname === "/new-company";
   const isBlogPage = location.pathname === "/blog";
-  const isSolidNavbar = isCertifiedPage || isNewCompanyPage || isBlogPage;
+  const isTrustReportPage = location.pathname === "/trust-report";
+  const isSLAPage = location.pathname === "/service-level-agreements";
+  const isSolidNavbar = isCertifiedPage || isNewCompanyPage || isBlogPage || isTrustReportPage || isSLAPage;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -66,19 +68,19 @@ const Navbar = () => {
               </Link>
             </li>
             <li className="relative group">
-              <Link to="/companies" className={linkClass}>
+              <div className={`${linkClass} cursor-pointer`}>
                 Trust And Transparency
                 <FaCaretDown className="ml-1" />
-              </Link>
+              </div>
               <ul className="absolute left-0 top-full mt-0 w-48 bg-white text-black shadow-xl rounded-b-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 px-0 py-2 z-50 border-t-2 border-secondary">
                 <li>
-                  <Link to="/report" className="block px-3 py-2 text-xs hover:text-secondary rounded-md">
-                    Trust report
+                  <Link to="/trust-report" className="block px-3 py-2 text-xs hover:text-secondary rounded-md">
+                    Trust Report
                   </Link>
                 </li>
                 <hr className="text-gray-200" />
                 <li>
-                  <Link to="/sla" className="block px-3 py-2 text-xs hover:text-secondary rounded-md truncate">
+                  <Link to="/service-level-agreements" className="block px-3 py-2 text-xs hover:text-secondary rounded-md truncate">
                     Service Level Agreements
                   </Link>
                 </li>
@@ -191,10 +193,10 @@ const Navbar = () => {
                 <FaCaretDown className={`transition-transform duration-300 ${activeSubmenu === 'trust' ? 'rotate-180' : ''}`} />
               </div>
               <div className={`pl-4 flex flex-col bg-gray-50 overflow-hidden transition-all duration-300 ${activeSubmenu === 'trust' ? 'max-h-40' : 'max-h-0'}`}>
-                <Link to="/report" className="py-3 text-sm text-gray-600 border-b border-gray-100" onClick={toggleMenu}>
-                  Trust report
+                <Link to="/trust-report" className="py-3 text-sm text-gray-600 border-b border-gray-100" onClick={toggleMenu}>
+                  Trust Report
                 </Link>
-                <Link to="/sla" className="py-3 text-sm text-gray-600 border-b border-gray-100" onClick={toggleMenu}>
+                <Link to="/service-level-agreements" className="py-3 text-sm text-gray-600 border-b border-gray-100" onClick={toggleMenu}>
                   Service Level Agreements
                 </Link>
                 <Link to="/complaint" className="py-3 text-sm text-gray-600 border-b border-gray-200" onClick={toggleMenu}>

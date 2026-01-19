@@ -1,6 +1,6 @@
 import React from 'react'
 import Navbar from '../components/common/Navbar'
-import Header from '../components/Header'
+import Header from '../components/common/Header'
 import CompanyCard from '../components/company/CompanyCard'
 import Trust from '../components/Trust'
 import ReviewCard from '../components/reviews/ReviewCard'
