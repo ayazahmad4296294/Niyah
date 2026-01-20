@@ -6,7 +6,7 @@ import { CiSearch } from "react-icons/ci";
 import { FaStar, FaUser } from "react-icons/fa6";
 import { ReviewsData } from '../data/reviewData';
 
-const Reviews = () => {
+const AllReviews = () => {
   const keywordStyling = `px-4 py-1 font-normal rounded-lg text-sm md:text-lg bg-primary text-white hover:bg-secondary hover:text-black transition-all duration-300 whitespace-nowrap`;
 
   return (
@@ -138,4 +138,4 @@ const Reviews = () => {
   );
 };
 
-export default Reviews;
+export default AllReviews;

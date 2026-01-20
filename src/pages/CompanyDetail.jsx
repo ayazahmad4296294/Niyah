@@ -43,7 +43,7 @@ const CompanyDetail = () => {
         {/* Section 1: Overview & Map (60/40 Split) */}
         <div className="flex flex-col lg:flex-row gap-10 items-stretch">
 
-          {/* Left (60%): Company Overview */}
+          {/* Left (50%): Company Overview */}
           <div className="w-full lg:w-[60%]">
             <section className="bg-white rounded-2xl shadow-sm p-8 md:p-10 border border-primary/5 h-full">
               <h2 className="text-2xl font-bold text-primary mb-8 border-b border-gray-100 pb-4">Overview</h2>
@@ -105,7 +105,7 @@ const CompanyDetail = () => {
             </section>
           </div>
 
-          {/* Right (40%): Company Location Map */}
+          {/* Right (50%): Company Location Map */}
           <div className="w-full lg:w-[40%]">
             <div className="bg-white rounded-2xl shadow-sm border border-primary/5 p-4 overflow-hidden h-full flex flex-col">
               <div className="grow w-full bg-gray-100 rounded-xl relative flex items-center justify-center overflow-hidden min-h-[300px]">
@@ -235,13 +235,13 @@ const CompanyDetail = () => {
           </div>
           <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
             <Link
-              to={`/file-complaint/${company.id}`}
+              to={`/file-complaint?mode=rate&companyId=${company.id}`}
               className="px-8 py-4 bg-secondary text-primary font-bold rounded-2xl text-center hover:bg-secondary/90 transition-all shadow-lg active:scale-95"
             >
               Rate This Company
             </Link>
             <Link
-              to={`/file-complaint/${company.id}`}
+              to={`/file-complaint?mode=complaint&companyId=${company.id}`}
               className="px-8 py-4 bg-white text-primary font-bold rounded-2xl text-center hover:bg-gray-100 transition-all shadow-lg active:scale-95 border-2 border-primary/5"
             >
               File a Complaint
@@ -251,8 +251,8 @@ const CompanyDetail = () => {
 
         {/* Footer Extension for Company Detail */}
         <div className="pt-10 border-t border-gray-200 flex justify-center">
-          <Link to="/reviews" className="text-primary font-bold text-lg underline hover:text-secondary transition-colors">
-            All Company Reviews
+          <Link to="/reviews" className="text-primary bg-secondary px-8 py-4 rounded-2xl font-bold text-lg hover:bg-secondary/90 transition-all shadow-lg active:scale-95">
+            See All Company Reviews
           </Link>
         </div>
       </div>

@@ -16,7 +16,7 @@ const Navbar = () => {
   const isBlogPage = location.pathname === "/blog";
   const isTrustReportPage = location.pathname === "/trust-report";
   const isSLAPage = location.pathname === "/service-level-agreements";
-  const isComplaintPage = location.pathname === "/file-a-complaint";
+  const isComplaintPage = location.pathname === "/file-complaint";
   const isBusinessPage = location.pathname === "/get-certified/business";
   const isNonProfitPage = location.pathname === "/get-certified/non-profit";
   const isAboutPage = location.pathname === "/about";
@@ -93,8 +93,8 @@ const Navbar = () => {
                 </li>
                 <hr className="text-gray-200" />
                 <li>
-                  <Link to="/file-a-complaint" className="block px-3 py-2 text-xs hover:text-secondary rounded-md">
-                    File A Complaint
+                  <Link to="/file-complaint" className="block px-3 py-2 text-xs hover:text-secondary rounded-md">
+                    Rate or Complaint
                   </Link>
                 </li>
               </ul>
@@ -205,8 +205,8 @@ const Navbar = () => {
                 <Link to="/service-level-agreements" className="py-3 text-sm text-gray-600 border-b border-gray-100" onClick={toggleMenu}>
                   Service Level Agreements
                 </Link>
-                <Link to="/file-a-complaint" className="py-3 text-sm text-gray-600 border-b border-gray-200" onClick={toggleMenu}>
-                  File A Complaint
+                <Link to="/file-complaint" className="py-3 text-sm text-gray-600 border-b border-gray-200" onClick={toggleMenu}>
+                  Rate or Complaint
                 </Link>
               </div>
             </div>

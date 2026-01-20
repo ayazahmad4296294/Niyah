@@ -69,6 +69,16 @@ const NewCompanyForm = () => {
                                     </select>
                                 </div>
                                 <div>
+                                    <label className={labelClass}>Number of Employees</label>
+                                    <select className={inputClass}>
+                                        <option value="1-10">1–10</option>
+                                        <option value="11-50">11–50</option>
+                                        <option value="51-200">51–200</option>
+                                        <option value="201-1000">201–1000</option>
+                                        <option value="1001+">1001+</option>
+                                    </select>
+                                </div>
+                                <div>
                                     <label className={labelClass}>Industry / Sector *</label>
                                     <div className="h-32 overflow-y-auto border border-gray-300 rounded-lg p-2 space-y-1">
                                         {['Hardware', 'Finance', 'Technology', 'Health', 'Banking', 'Insurance', 'Retail', 'Energy'].map(industry => (
@@ -84,15 +94,10 @@ const NewCompanyForm = () => {
                                     <input type="text" className={inputClass} placeholder="Enter a custom industry if not listed above" />
                                     <p className={helperTextClass}>Enter a custom industry if not listed above</p>
                                 </div>
-                                <div>
-                                    <label className={labelClass}>Number of Employees</label>
-                                    <select className={inputClass}>
-                                        <option value="1-10">1–10</option>
-                                        <option value="11-50">11–50</option>
-                                        <option value="51-200">51–200</option>
-                                        <option value="201-1000">201–1000</option>
-                                        <option value="1001+">1001+</option>
-                                    </select>
+                                <div className="md:col-span-2">
+                                    <label className={labelClass}>Company Address *</label>
+                                    <input type="text" className={inputClass} placeholder="Enter your company address manually" />
+                                    <p className={helperTextClass}>Start typing and select from address suggestions.</p>
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className={labelClass}>Company Logo</label>
@@ -111,12 +116,7 @@ const NewCompanyForm = () => {
                                         </div>
                                     </div>
                                     <p className={helperTextClass}>Upload your company logo. This will be used as your company's featured image and displayed in the verification seal.</p>
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className={labelClass}>Company Address *</label>
-                                    <input type="text" className={inputClass} placeholder="Enter your company address manually" />
-                                    <p className={helperTextClass}>Start typing and select from address suggestions. A map preview will appear when you select an address.</p>
-                                </div>
+                                </div>              
                             </div>
                         </section>
 

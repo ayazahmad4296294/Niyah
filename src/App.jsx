@@ -9,15 +9,16 @@ import { CompanyProvider } from './context/CompanyContext'
 import NewCompanyForm from './pages/NewCompanyForm'
 import TrustReport from './pages/TrustAndTransparency/TrustReport'
 import ServiceLevelAgreements from './pages/TrustAndTransparency/ServiceLevelAgreements'
-import FileAComplaint from './pages/TrustAndTransparency/FileAComplaint'
+import RateOrComplaint from './pages/TrustAndTransparency/RateOrComplaint'
 import Blog from './pages/Blog'
 import Business from './pages/GetCertified/Business'
 import NonProfit from './pages/GetCertified/NonProfit'
 import About from './pages/About'
 import Contact from './pages/Contact'
-import Reviews from './pages/Reviews'
+import AllReviews from './pages/AllReviews'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import CompanyDetail from './pages/CompanyDetail'
+import ScrollToTop from './components/common/ScrollToTop'
 
 const App = () => {
   useEffect(() => {
@@ -30,6 +31,7 @@ const App = () => {
 
   return (
     <CompanyProvider>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<AuthPage />} />
@@ -38,14 +40,13 @@ const App = () => {
         <Route path="/new-company" element={<NewCompanyForm />} />
         <Route path="/trust-report" element={<TrustReport />} />
         <Route path="/service-level-agreements" element={<ServiceLevelAgreements />} />
-        <Route path="/file-a-complaint" element={<FileAComplaint />} />
-        <Route path="/file-complaint/:companyId" element={<FileAComplaint />} />
+        <Route path="/file-complaint" element={<RateOrComplaint />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/get-certified/business" element={<Business />} />
         <Route path="/get-certified/non-profit" element={<NonProfit />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/reviews" element={<Reviews />} />
+        <Route path="/reviews" element={<AllReviews />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/company/:companyId" element={<CompanyDetail />} />
       </Routes>
