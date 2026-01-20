@@ -23,7 +23,7 @@ import ScrollToTop from './components/common/ScrollToTop'
 const App = () => {
   useEffect(() => {
     AOS.init({
-      duration: 800,
+      duration: 600,
       once: true,
       easing: 'ease-in-out',
     });

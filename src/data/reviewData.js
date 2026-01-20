@@ -4,7 +4,7 @@ export const ReviewsData = [
     {
         id: 1,
         name: "kimjohn",
-        text: "Exceptional service and timely delivery. Very professional team.",
+        text: "Very professional team.",
         rating: 4,
         company: {
             name: "Bruce Hopkins Co",
@@ -15,7 +15,7 @@ export const ReviewsData = [
     {
         id: 2,
         name: "stoke",
-        text: "Had a bit of a delay, but the quality was worth it.",
+        text: "Had a bit of a delay",
         rating: 3,
         company: {
             name: "Levine and Lancaster LLC",
@@ -26,7 +26,7 @@ export const ReviewsData = [
     {
         id: 3,
         name: "Victor",
-        text: "Very helpful and verified organization. Highly recommended.",
+        text: "Highly recommended.",
         rating: 5,
         company: {
             name: "Bruce Hopkins Co",
@@ -37,7 +37,7 @@ export const ReviewsData = [
     {
         id: 4,
         name: "Morgan",
-        text: "Excellent support team and transparent processes.",
+        text: "Excellent team",
         rating: 4,
         company: {
             name: "Acme Finance Corp",
@@ -48,7 +48,7 @@ export const ReviewsData = [
     {
         id: 5,
         name: "Alice",
-        text: "Impressive quality and speed. Best in the industry.",
+        text: "Best in the industry.",
         rating: 5,
         company: {
             name: "Bruce Hopkins Co",
@@ -59,7 +59,7 @@ export const ReviewsData = [
     {
         id: 6,
         name: "Bob",
-        text: "Reliable and trustworthy. They really follow through.",
+        text: "Reliable and trustworthy",
         rating: 5,
         company: {
             name: "HealthConnect Systems",
@@ -70,7 +70,7 @@ export const ReviewsData = [
     {
         id: 7,
         name: "Sarah",
-        text: "Fast and professional. Verification process was smooth.",
+        text: "Fast and professional",
         rating: 5,
         company: {
             name: "Levine and Lancaster LLC",
@@ -81,7 +81,7 @@ export const ReviewsData = [
     {
         id: 8,
         name: "David",
-        text: "Could be better experience. Communication was slow.",
+        text: "Communication was slow.",
         rating: 2,
         company: {
             name: "EduBase Learning",
@@ -92,7 +92,7 @@ export const ReviewsData = [
     {
         id: 9,
         name: "Emma",
-        text: "The best verification platform I've used so far.",
+        text: "The best verification platform",
         rating: 5,
         company: {
             name: "Acme Finance Corp",

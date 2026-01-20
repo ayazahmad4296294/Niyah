@@ -1,5 +1,6 @@
 import React from 'react';
 import TrustReportImg from '../assets/images/trust-report.png';
+import { Link } from 'react-router-dom';
 
 const Trust = () => {
     return (
@@ -12,9 +13,9 @@ const Trust = () => {
                     with confidence, and enabling companies to prove their credibility and improve through
                     genuine feedback.
                 </p>
-                <button className="bg-white text-black font-medium px-4 py-2 rounded-full border-white border hover:bg-primary hover:text-white hover:border hover:border-white transition-all duration-300 whitespace-nowrap">
+                <Link to="/about" className="bg-white text-black font-medium px-4 py-2 rounded-full border-white border hover:bg-primary hover:text-white hover:border hover:border-white transition-all duration-300 whitespace-nowrap inline-block">
                     What we do
-                </button>
+                </Link>
             </div>
             <div className="flex-1 w-full">
                 <div className="bg-white p-4 rounded-2xl flex flex-col sm:flex-row items-center gap-6 text-black border border-gray-100 shadow-lg">
@@ -23,9 +24,9 @@ const Trust = () => {
                         <p className="text-sm text-gray-600 mb-6 leading-relaxed">
                             Find out which actions we’ve taken to protect you and promote trust on our platform.
                         </p>
-                        <button className="border border-black px-6 py-2 rounded-full hover:bg-black hover:text-white transition-all duration-300 font-medium whitespace-nowrap">
+                        <Link to="/trust-report" className="border border-black px-6 py-2 rounded-full hover:bg-black hover:text-white transition-all duration-300 font-medium whitespace-nowrap inline-block">
                             Take a look
-                        </button>
+                        </Link>
                     </div>
                     <div className="w-32 md:w-44 shrink-0">
                         <img src={TrustReportImg} alt="Trust Report Illustration" className="w-full h-auto" />
