@@ -19,19 +19,21 @@ import AllReviews from './pages/AllReviews'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import CompanyDetail from './pages/CompanyDetail'
 import ScrollToTop from './components/common/ScrollToTop'
+import { AuthProvider } from './context/AuthContext'
 
 const App = () => {
-  useEffect(() => {
-    AOS.init({
-      duration: 600,
-      once: true,
-      easing: 'ease-in-out',
-    });
-  }, []);
+  // useEffect(() => {
+  //   AOS.init({
+  //     duration: 600,
+  //     once: true,
+  //     easing: 'ease-in-out',
+  //   });
+  // }, []);
 
   return (
-    <CompanyProvider>
-      <ScrollToTop />
+    <AuthProvider>
+      <CompanyProvider>
+        <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<AuthPage />} />
@@ -39,7 +41,7 @@ const App = () => {
         <Route path="/certified-companies" element={<CertifiedCompanies />} />
         <Route path="/new-company" element={<NewCompanyForm />} />
         <Route path="/trust-report" element={<TrustReport />} />
-        <Route path="/service-level-agreements" element={<ServiceLevelAgreements />} />
+          <Route path="/service-level-agreements" element={<ServiceLevelAgreements />} />
         <Route path="/file-complaint" element={<RateOrComplaint />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/get-certified/business" element={<Business />} />
@@ -50,7 +52,8 @@ const App = () => {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/company/:companyId" element={<CompanyDetail />} />
       </Routes>
-    </CompanyProvider>
+      </CompanyProvider>
+    </AuthProvider>
   )
 }
 

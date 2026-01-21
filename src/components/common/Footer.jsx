@@ -7,7 +7,7 @@ const Footer = () => {
       <footer className="bg-primary text-white py-14 px-4 md:px-24 overflow-hidden">
          <div className="max-w-7xl mx-auto">
             {/* Logo Section */}
-            <div className="mb-12">
+            <div className="mb-12 ml-2">
                <img src={Logo} alt="Niyah Logo" className="w-22 h-22 brightness-0 invert" />
             </div>
 

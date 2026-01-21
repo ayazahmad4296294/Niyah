@@ -1,16 +1,47 @@
-# React + Vite
+# Niyah Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project consists of a React frontend and a Node.js/Express backend.
 
-Currently, two official plugins are available:
+## Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Prerequisites
 
-## React Compiler
+- Node.js installed
+- MongoDB connection string (already configured in `server/.env`)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Installation
 
-## Expanding the ESLint configuration
+1.  **Backend Setup:**
+    ```bash
+    cd server
+    npm install
+    ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+2.  **Frontend Setup:**
+    ```bash
+    npm install
+    ```
+
+### Running the Application
+
+1.  **Start the Backend Server:**
+    Open a terminal and run:
+    ```bash
+    cd server
+    npm run dev
+    ```
+    The server will run on `http://localhost:5000`.
+
+2.  **Start the Frontend:**
+    Open a new terminal and run:
+    ```bash
+    npm run dev
+    ```
+    The frontend will run on `http://localhost:5173`.
+
+## Features
+- **Frontend:** React + Vite + TailwindCSS
+- **Backend:** Node.js + Express + Mongoose
+
+## API Endpoints
+- `GET /api/test`: Check backend connection

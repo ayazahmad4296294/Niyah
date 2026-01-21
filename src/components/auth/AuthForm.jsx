@@ -1,13 +1,60 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
 
 const AuthForm = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const isRegisterPath = location.pathname === '/register';
     const [isLogin, setIsLogin] = useState(!isRegisterPath);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+    });
+    const [error, setError] = useState('');
+    const [message, setMessage] = useState('');
+
+    const { login } = useAuth();
 
     const toggleMode = () => {
         setIsLogin(!isLogin);
+        setError('');
+        setMessage('');
+        setFormData({ name: '', email: '', password: '' });
+    };
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setMessage('');
+
+        const endpoint = isLogin ? '/login' : '/register';
+        const url = `http://localhost:5002/api/auth${endpoint}`;
+
+        try {
+            const response = await axios.post(url, formData);
+
+            if (isLogin) {
+                // Login Success - Use Context
+                login(response.data, response.data.token);
+                navigate('/'); // Redirect to home
+            } else {
+                // Register Success
+                setMessage(response.data.message);
+                setIsLogin(true); // Switch to login view
+                setFormData({ name: '', email: '', password: '' });
+            }
+        } catch (err) {
+            console.error("Auth Error:", err);
+            const msg = err.response?.data?.message || err.message || 'Something went wrong';
+            setError(msg);
+        }
     };
 
     const inputClass = "w-full px-4 py-2.5 rounded-xl border-1 border-primary/10 focus:border-primary focus:outline-none transition-colors text-lg bg-gray-50";
@@ -19,14 +66,21 @@ const AuthForm = () => {
                 {isLogin ? 'Login' : 'Register'}
             </h2>
 
-            <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
+            {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm text-center">{error}</div>}
+            {message && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm text-center">{message}</div>}
+
+            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
                 {!isLogin && (
                     <div>
                         <label className={labelClass}>Full Name</label>
                         <input
                             type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
                             placeholder="Enter your name"
                             className={inputClass}
+                            required={!isLogin}
                         />
                     </div>
                 )}
@@ -35,8 +89,12 @@ const AuthForm = () => {
                     <label className={labelClass}>Email Address</label>
                     <input
                         type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
                         placeholder="example@mail.com"
                         className={inputClass}
+                        required
                     />
                 </div>
 
@@ -44,8 +102,12 @@ const AuthForm = () => {
                     <label className={labelClass}>Password</label>
                     <input
                         type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
                         placeholder="••••••••"
                         className={inputClass}
+                        required
                     />
                 </div>
 
@@ -68,7 +130,10 @@ const AuthForm = () => {
                     </div>
                 </div>
 
-                <button className="w-full py-3 bg-primary text-white font-bold rounded-xl text-lg hover:bg-primary/90 transition-all shadow-lg active:scale-95">
+                <button
+                    type="submit"
+                    className="w-full py-3 bg-primary text-white font-bold rounded-xl text-lg hover:bg-primary/90 transition-all shadow-lg active:scale-95"
+                >
                     {isLogin ? 'Login' : 'Register'}
                 </button>
             </form>

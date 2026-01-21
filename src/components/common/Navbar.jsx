@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { FaCaretDown } from "react-icons/fa";
-import { IoIosPeople, IoMdClose } from "react-icons/io";
+import { IoIosPeople, IoMdClose, IoMdLogOut } from "react-icons/io";
 import { TfiMenu } from "react-icons/tfi";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo.webp";
+
+import { useAuth } from "../../context/AuthContext";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Use Auth Context
+  const { user, logout } = useAuth();
+
   const [activeSubmenu, setActiveSubmenu] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
+
   const isCertifiedPage = location.pathname === "/certified-companies";
   const isNewCompanyPage = location.pathname === "/new-company";
   const isBlogPage = location.pathname === "/blog";
@@ -22,16 +29,25 @@ const Navbar = () => {
   const isAboutPage = location.pathname === "/about";
   const isContactPage = location.pathname === "/contact";
   const isReviewsPage = location.pathname === "/reviews";
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/register";
   const isPrivacyPolicyPage = location.pathname === "/privacy-policy";
-  const isSolidNavbar = isCertifiedPage || isNewCompanyPage || isBlogPage || isTrustReportPage || isSLAPage || isComplaintPage || isBusinessPage || isNonProfitPage || isAboutPage || isContactPage || isReviewsPage || isPrivacyPolicyPage;
+  const isSolidNavbar = isCertifiedPage || isNewCompanyPage || isBlogPage || isTrustReportPage || isSLAPage || isComplaintPage || isBusinessPage || isNonProfitPage || isAboutPage || isContactPage || isReviewsPage || isAuthPage || isPrivacyPolicyPage;
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -108,17 +124,32 @@ const Navbar = () => {
 
           {/* Buttons */}
           <div className="flex items-center gap-4 ml-4">
-            <Link
-              to="/login"
-              className={`px-4 xl:px-6 py-2 border-2 rounded-full font-medium transition-all duration-300 flex items-center gap-2
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className={`px-4 xl:px-6 py-2 border-2 rounded-full font-medium transition-all duration-300 flex items-center gap-2
               ${(scrolled || isSolidNavbar)
-                  ? "border-white text-white hover:bg-white hover:text-primary"
-                  : "border-black text-primary hover:bg-secondary hover:border-2 hover:border-secondary hover:text-white"
-                }`}
-            >
-              <IoIosPeople className="text-xl" />
-              Login
-            </Link>
+                    ? "border-white text-white hover:bg-white hover:text-primary"
+                    : "border-black text-primary hover:bg-secondary hover:border-2 hover:border-secondary hover:text-white"
+                  }`}
+              >
+                {/* <IoMdLogOut className="text-xl" /> */}
+                Logout
+              </button>
+            ) : (
+                <Link
+                  to="/login"
+                  className={`px-4 xl:px-6 py-2 border-2 rounded-full font-medium transition-all duration-300 flex items-center gap-2
+              ${(scrolled || isSolidNavbar)
+                      ? "border-white text-white hover:bg-white hover:text-primary"
+                      : "border-black text-primary hover:bg-secondary hover:border-2 hover:border-secondary hover:text-white"
+                    }`}
+                >
+                  {/* <IoIosPeople className="text-xl" /> */}
+                  Login
+                </Link>
+            )}
+
             <div className="relative group">
               <div
                 className="px-4 xl:px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-full font-semibold transition-all duration-300 flex items-center gap-1 shadow-md hover:shadow-lg cursor-pointer"
@@ -237,14 +268,27 @@ const Navbar = () => {
 
           {/* Mobile Buttons at Bottom */}
           <div className="mt-auto flex flex-col gap-4 pt-6 border-t border-gray-100">
-            <Link
-              to="/login"
-              className="flex items-center justify-center gap-2 w-full py-4 border-2 border-primary text-primary font-bold rounded-xl active:bg-primary active:text-white transition-all shadow-sm"
-              onClick={toggleMenu}
-            >
-              <IoIosPeople size={24} />
-              Login
-            </Link>
+            {user ? (
+              <button
+                onClick={() => {
+                  handleLogout();
+                  toggleMenu();
+                }}
+                className="flex items-center justify-center gap-2 w-full py-4 border-2 border-primary text-primary font-bold rounded-xl active:bg-primary active:text-white transition-all shadow-sm"
+              >
+                <IoMdLogOut size={24} />
+                Logout
+              </button>
+            ) : (
+                <Link
+                  to="/login"
+                  className="flex items-center justify-center gap-2 w-full py-4 border-2 border-primary text-primary font-bold rounded-xl active:bg-primary active:text-white transition-all shadow-sm"
+                  onClick={toggleMenu}
+                >
+                  <IoIosPeople size={24} />
+                  Login
+                </Link>
+            )}
           </div>
         </div>
       </div>
