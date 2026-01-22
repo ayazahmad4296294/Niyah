@@ -24,7 +24,11 @@ export const CompanyProvider = ({ children }) => {
                 // Using full URL for safety in dev if proxy not confirmed, but typically relative is better with proxy.
                 // Let's assume standard Vite proxy setup or cors is enabled on backend (it is).
                 const response = await axios.get('/api/companies');
-                setCompanies(response.data);
+                if (response.data.success) {
+                    setCompanies(response.data.data);
+                } else {
+                    setCompanies(response.data); // Fallback if data is not nested as expected
+                }
                 setLoading(false);
             } catch (err) {
                 console.error("Failed to fetch companies:", err);

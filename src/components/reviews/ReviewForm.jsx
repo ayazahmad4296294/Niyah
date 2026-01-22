@@ -44,7 +44,7 @@ const ReviewForm = ({ companyName }) => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          companyId: companyName, // Using name as ID per current system
+          companyId: companyId, // Correctly using MongoDB _id
           name: formData.name,
           email: formData.email,
           rating: rating,

@@ -5,25 +5,31 @@ import Footer from '../components/common/Footer';
 import { CiSearch } from "react-icons/ci";
 import { FaStar, FaUser } from "react-icons/fa6";
 import { useCompany } from '../context/CompanyContext';
+import logo from '../assets/images/logo.webp';
 
 const AllReviews = () => {
   const { companies } = useCompany();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 9;
 
   const keywordStyling = `px-4 py-1 font-normal rounded-lg text-sm md:text-lg bg-primary text-white hover:bg-secondary hover:text-black transition-all duration-300 whitespace-nowrap`;
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchReviews = async () => {
+      setLoading(true);
       try {
-        const response = await fetch('/api/reviews');
+        const response = await fetch(`/api/reviews?page=${currentPage}&limit=${limit}`);
         if (!response.ok) {
           throw new Error('Failed to fetch reviews');
         }
         const data = await response.json();
         if (data.success) {
           setReviews(data.data);
+          setTotalPages(data.pagination.totalPages);
         } else {
           setError('Failed to load reviews.');
         }
@@ -35,7 +41,14 @@ const AllReviews = () => {
       }
     };
     fetchReviews();
-  }, []);
+  }, [currentPage]);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className='w-full bg-[#FCFBF3]'>
@@ -98,7 +111,7 @@ const AllReviews = () => {
             </div>
           ) : reviews.length > 0 ? (
             reviews.map((review) => {
-              const reviewCompany = companies.find(c => c.name === review.companyId);
+              const reviewCompany = companies.find(c => c._id === review.companyId);
               return (
                 <div key={review._id} className="h-full">
                   <div className="bg-primary text-white p-6 rounded-xl shadow-lg h-full flex flex-col gap-4 min-h-[220px]">
@@ -132,19 +145,19 @@ const AllReviews = () => {
                     <div className="flex flex-col gap-4">
                       <hr className="border-white opacity-40" />
                       <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-md bg-white p-1 shrink-0 overflow-hidden">
+                        <div className="w-7 h-7 rounded-md bg-white p-1 shrink-0 overflow-hidden text-primary flex items-center justify-center font-bold">
                           {reviewCompany ? (
                             <img
-                              src={reviewCompany.image}
-                              alt={review.companyId}
+                              src={logo}
+                              alt={reviewCompany.name}
                               className="w-full h-full object-contain"
                             />
                           ) : (
-                            <div className="w-full h-full bg-gray-200" />
+                              "?"
                           )}
                         </div>
                         <div className="flex flex-col overflow-hidden">
-                          <p className="text-sm font-semibold truncate">{review.companyId}</p>
+                          <p className="text-sm font-semibold truncate">{reviewCompany?.name || review.companyId}</p>
                           <p className="text-xs text-gray-400 truncate">{reviewCompany?.website || "Website not found"}</p>
                         </div>
                       </div>
@@ -153,21 +166,43 @@ const AllReviews = () => {
                 </div>
               );
             })
-            ) : (
-              <div className="col-span-full text-center py-20">
-                <p className="text-gray-500">No reviews found.</p>
+              ) : (
+                <div className="col-span-full text-center py-20">
+                  <p className="text-gray-500">No reviews found.</p>
             </div>
           )}
         </div>
 
         {/* Pagination Section */}
-        <div className='flex items-center justify-center gap-2'>
-          <button className='w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white font-medium hover:bg-secondary hover:text-black transition-all'>1</button>
-          <button className='w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-primary/10 text-primary font-medium hover:bg-primary/5 transition-all'>2</button>
-          <button className='w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-primary/10 text-primary font-medium hover:bg-primary/5 transition-all'>3</button>
-          <span className='mx-2 text-primary/40 text-xl font-bold'>...</span>
-          <button className='px-4 h-10 flex items-center justify-center rounded-lg bg-white border border-primary/10 text-primary font-medium hover:bg-primary/5 transition-all'>Next</button>
-        </div>
+        {totalPages > 1 && (
+          <div className='flex items-center justify-center gap-2'>
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`px-4 h-10 flex items-center justify-center rounded-lg border font-medium transition-all ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border-primary/20 text-primary hover:bg-primary/5 cursor-pointer'}`}
+            >
+              Prev
+            </button>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => handlePageChange(i + 1)}
+                className={`w-10 h-10 flex items-center justify-center rounded-lg font-medium transition-all cursor-pointer ${currentPage === i + 1 ? 'bg-primary text-white shadow-lg' : 'bg-white border border-primary/10 text-primary hover:bg-primary/5'}`}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`px-4 h-10 flex items-center justify-center rounded-lg border font-medium transition-all ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border-primary/20 text-primary hover:bg-primary/5 cursor-pointer'}`}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       <Footer />

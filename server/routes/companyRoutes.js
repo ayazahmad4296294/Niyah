@@ -1,5 +1,6 @@
 import express from 'express';
 import Company from '../models/Company.js';
+import { getCompanyReviews } from '../controllers/review.controller.js';
 
 const router = express.Router();
 
@@ -177,17 +178,40 @@ router.post('/seed', async (req, res) => {
 });
 
 // @route   GET /api/companies
-// @desc    Get all companies
+// @desc    Get all companies with pagination
 // @access  Public
 router.get('/', async (req, res) => {
     try {
-        const companies = await Company.find().sort({ createdAt: -1 });
-        res.json(companies);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 12;
+        const skip = (page - 1) * limit;
+
+        const totalItems = await Company.countDocuments();
+        const companies = await Company.find()
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        res.json({
+            success: true,
+            data: companies,
+            pagination: {
+                totalItems,
+                totalPages: Math.ceil(totalItems / limit),
+                currentPage: page,
+                limit
+            }
+        });
     } catch (error) {
         console.error('Fetch companies error:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
+
+// @route   GET /api/companies/:id/reviews
+// @desc    Get reviews for a specific company with pagination
+// @access  Public
+router.get('/:companyId/reviews', getCompanyReviews);
 
 // @route   GET /api/companies/:id
 // @desc    Get single company by ID

@@ -17,6 +17,9 @@ const CompanyDetail = () => {
   const [companyReviews, setCompanyReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [reviewError, setReviewError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 9;
 
   // Find the company based on the dynamic ID
   const company = companies.find((c) => c._id === companyId);
@@ -38,35 +41,42 @@ const CompanyDetail = () => {
 
   useEffect(() => {
     const fetchReviews = async () => {
-      if (company) {
-        try {
-          // Note: using company._id as the ID for relations
-          const response = await fetch(`/api/reviews/${company._id}`);
-          if (!response.ok) {
-            throw new Error('Failed to fetch reviews');
-          }
-          const data = await response.json();
-          if (data.success) {
-            setCompanyReviews(data.data);
-          } else {
-            setReviewError('Failed to load reviews.');
-          }
-        } catch (error) {
-          console.error('Error fetching reviews:', error);
-          setReviewError('Unable to load reviews for this company.');
-        } finally {
-          setLoadingReviews(false);
+      setLoadingReviews(true);
+      try {
+        // Use the new paginated reviews endpoint
+        const response = await fetch(`/api/companies/${company._id}/reviews?page=${currentPage}&limit=${limit}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch reviews');
         }
+        const data = await response.json();
+        if (data.success) {
+          setCompanyReviews(data.data);
+          setTotalPages(data.pagination.totalPages);
+        } else {
+          setReviewError('Failed to load reviews.');
+        }
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+        setReviewError('Unable to load reviews for this company.');
+      } finally {
+        setLoadingReviews(false);
       }
     };
 
-    fetchReviews();
-  }, [company]);
+    if (company._id) {
+      fetchReviews();
+    }
+  }, [company._id, currentPage]);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      // Optional: scroll to reviews section
+    }
+  };
 
   const handleReviewClick = () => {
     if (!user) {
-      // If not logged in, redirect to login page with return URL state
-      // Alternatively, could show a modal, but redirection is standard
       if (window.confirm("You must be logged in to write a review. Go to login page?")) {
         navigate('/login');
       }
@@ -172,7 +182,8 @@ const CompanyDetail = () => {
           <div className="w-full lg:w-1/2">
             <div className="bg-white rounded-2xl shadow-sm border border-primary/5 p-8 flex flex-col items-center text-center h-full justify-center">
               <div className="w-20 h-20 bg-primary/5 rounded-2xl p-4 mb-6 flex items-center justify-center border border-primary/5">
-                <img src={company.image} alt={company.name} className="max-h-full object-contain" />
+                {/* Fallback to text if no image (since we don't store images in DB) */}
+                <span className="text-3xl font-bold text-primary">{company.name.charAt(0)}</span>
               </div>
               <h3 className="text-xl font-bold text-black mb-1">{company.name}</h3>
               <div className="flex items-center gap-2 text-green-600 font-bold mb-4">
@@ -217,7 +228,7 @@ const CompanyDetail = () => {
         </div>
 
         {/* REVIEWS SECTION (Full Width) */}
-        <section>
+        <section id="reviews">
           <div className="flex items-center justify-between mb-8 text-center">
             <h2 className="text-3xl font-bold text-primary w-full md:text-left">Company Reviews</h2>
           </div>
@@ -231,28 +242,61 @@ const CompanyDetail = () => {
               <p className="text-red-500 font-semibold">{reviewError}</p>
             </div>
           ) : companyReviews.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {companyReviews.map((review) => (
-                <div key={review._id} className="bg-primary text-white p-6 rounded-xl shadow-md flex flex-col gap-4 min-h-[220px]">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white shrink-0">
-                      <FaUser size={20} />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg leading-none">{review.name}</h3>
-                      <div className="flex gap-1 mt-1">
-                        {[...Array(5)].map((_, i) => (
-                          <div key={i} className={`w-5 h-5 flex items-center justify-center rounded-sm ${i < review.rating ? "bg-secondary" : "bg-gray-400"}`}>
-                            <FaStar size={10} className="text-white" />
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {companyReviews.map((review) => (
+                      <div key={review._id} className="bg-primary text-white p-6 rounded-xl shadow-md flex flex-col gap-4 min-h-[220px]">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white shrink-0">
+                            <FaUser size={20} />
                           </div>
-                        ))}
+                          <div>
+                            <h3 className="font-bold text-lg leading-none">{review.name}</h3>
+                            <div className="flex gap-1 mt-1">
+                              {[...Array(5)].map((_, i) => (
+                                <div key={i} className={`w-5 h-5 flex items-center justify-center rounded-sm ${i < review.rating ? "bg-secondary" : "bg-gray-400"}`}>
+                                  <FaStar size={10} className="text-white" />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-sm grow text-gray-100 italic">"{review.reviewText}"</p>
                       </div>
-                    </div>
+                    ))}
                   </div>
-                  <p className="text-sm grow text-gray-100 italic">"{review.reviewText}"</p>
-                </div>
-              ))}
-            </div>
+
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <div className='flex items-center justify-center gap-2 mt-8'>
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className={`px-4 h-10 flex items-center justify-center rounded-lg border font-medium transition-all ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border-primary/20 text-primary hover:bg-primary/5 cursor-pointer'}`}
+                      >
+                        Prev
+                      </button>
+
+                      {[...Array(totalPages)].map((_, i) => (
+                        <button
+                          key={i + 1}
+                          onClick={() => handlePageChange(i + 1)}
+                          className={`w-10 h-10 flex items-center justify-center rounded-lg font-medium transition-all cursor-pointer ${currentPage === i + 1 ? 'bg-primary text-white shadow-lg' : 'bg-white border border-primary/10 text-primary hover:bg-primary/5'}`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className={`px-4 h-10 flex items-center justify-center rounded-lg border font-medium transition-all ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border-primary/20 text-primary hover:bg-primary/5 cursor-pointer'}`}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
           ) : (
             <div className="bg-white rounded-2xl p-10 text-center border border-dashed border-gray-300">
               <p className="text-gray-500">No reviews found for this company yet.</p>
@@ -271,7 +315,7 @@ const CompanyDetail = () => {
 
           {isReviewFormOpen && (
             <div className="mt-8 mb-4">
-              <ReviewForm companyName={company.name} />
+              <ReviewForm companyName={company.name} companyId={company._id} />
             </div>
           )}
         </section>

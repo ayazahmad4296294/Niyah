@@ -5,11 +5,25 @@ import Review from '../models/Review.js';
 // @access  Public
 export const getAllReviews = async (req, res) => {
     try {
-        const reviews = await Review.find().sort({ createdAt: -1 });
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 9;
+        const skip = (page - 1) * limit;
+
+        const totalItems = await Review.countDocuments();
+        const reviews = await Review.find()
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
         res.status(200).json({
             success: true,
-            count: reviews.length,
-            data: reviews
+            data: reviews,
+            pagination: {
+                totalItems,
+                totalPages: Math.ceil(totalItems / limit),
+                currentPage: page,
+                limit
+            }
         });
     } catch (error) {
         console.error('Error fetching all reviews:', error);
@@ -71,15 +85,30 @@ export const submitReview = async (req, res) => {
 // @access  Public
 export const getCompanyReviews = async (req, res) => {
     const { companyId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 9;
+    const skip = (page - 1) * limit;
 
     try {
-        const reviews = await Review.find({
+        const query = {
             companyId: { $regex: new RegExp(`^${companyId}$`, 'i') }
-        }).sort({ createdAt: -1 });
+        };
+
+        const totalItems = await Review.countDocuments(query);
+        const reviews = await Review.find(query)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
         res.status(200).json({
             success: true,
-            count: reviews.length,
-            data: reviews
+            data: reviews,
+            pagination: {
+                totalItems,
+                totalPages: Math.ceil(totalItems / limit),
+                currentPage: page,
+                limit
+            }
         });
     } catch (error) {
         console.error('Error fetching reviews:', error);

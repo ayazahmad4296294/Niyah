@@ -1,12 +1,48 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import CompanyCard from '../components/company/CompanyCard';
 import bgImage from '../assets/images/certifiedcompaniesheaher.png';
-import { useCompany } from '../context/CompanyContext';
+
+import axios from 'axios';
 
 const CertifiedCompanies = () => {
-    const { companies } = useCompany();
+    const [companies, setCompanies] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const limit = 12;
+
+    useEffect(() => {
+        const fetchCompanies = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`/api/companies?page=${currentPage}&limit=${limit}`);
+                if (response.data.success) {
+                    setCompanies(response.data.data);
+                    setTotalPages(response.data.pagination.totalPages);
+                } else {
+                    setError('Failed to fetch companies');
+                }
+            } catch (err) {
+                console.error('Error fetching companies:', err);
+                setError('An error occurred while fetching companies');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCompanies();
+    }, [currentPage]);
+
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
     return (
         <div className='w-full'>
 
@@ -34,25 +70,60 @@ const CertifiedCompanies = () => {
             </div>
 
             {/* Content Section (Scrolls normally over the header) */}
-            <div className='relative z-20 bg-white min-h-[800px] shadow-[0_-10px_20px_rgba(0,0,0,0.1)] py-16 px-6 md:px-10'>
+            <div className='relative z-20 bg-white min-h-[600px] shadow-[0_-10px_20px_rgba(0,0,0,0.1)] py-16 px-6 md:px-10'>
                 <div className='max-w-7xl mx-auto'>
 
-                    {/* Render 12 Company Cards */}
-                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16'>
-                        {companies.slice(0, 12).map((company, index) => (
-                            <CompanyCard key={company._id} company={company} index={index} />
-                        ))}
-                    </div>
+                    {loading ? (
+                        <div className="text-center py-20">
+                            <p className="text-primary text-xl font-bold">Loading Companies...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="text-center py-20">
+                            <p className="text-red-500 text-xl font-bold">{error}</p>
+                        </div>
+                    ) : companies.length > 0 ? (
+                        <>
+                            {/* Render Company Cards */}
+                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16'>
+                                        {companies.map((company, index) => (
+                                            <CompanyCard key={company._id} company={company} index={index} />
+                                        ))}
+                                    </div>
 
-                    {/* Pagination Buttons (UI Only) */}
-                    <div className='flex items-center justify-center gap-2 border-t border-gray-100'>
-                        <button className='w-10 h-10 flex items-center justify-center bg-primary text-white font-bold transition-all hover:bg-secondary cursor-pointer'>
-                            1
-                        </button>
-                        <button className='w-10 h-10 flex items-center justify-center bg-white text-primary border-2 border-primary font-bold transition-all hover:bg-gray-50 cursor-pointer'>
-                            2
-                        </button>
-                    </div>
+                                    {/* Pagination UI */}
+                                    <div className='flex items-center justify-center gap-2 border-t border-gray-100 pt-8'>
+                                        <button
+                                            onClick={() => handlePageChange(currentPage - 1)}
+                                            disabled={currentPage === 1}
+                                            className={`px-4 h-10 flex items-center justify-center rounded-lg border font-medium transition-all ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border-primary/20 text-primary hover:bg-primary/5 cursor-pointer'}`}
+                                        >
+                                            Prev
+                                        </button>
+
+                                        {[...Array(totalPages)].map((_, i) => (
+                                            <button
+                                                key={i + 1}
+                                                onClick={() => handlePageChange(i + 1)}
+                                                className={`w-10 h-10 flex items-center justify-center font-bold transition-all cursor-pointer ${currentPage === i + 1 ? 'bg-primary text-white' : 'bg-white text-primary border-2 border-primary/10 hover:bg-gray-50'}`}
+                                            >
+                                                {i + 1}
+                                            </button>
+                                        ))}
+
+                                        <button
+                                            onClick={() => handlePageChange(currentPage + 1)}
+                                            disabled={currentPage === totalPages}
+                                            className={`px-4 h-10 flex items-center justify-center rounded-lg border font-medium transition-all ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white border-primary/20 text-primary hover:bg-primary/5 cursor-pointer'}`}
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                        </>
+                    ) : (
+                        <div className="text-center py-20">
+                            <p className="text-gray-500 text-xl">No companies found.</p>
+                        </div>
+                    )}
                 </div>
             </div>
 
