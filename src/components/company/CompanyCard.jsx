@@ -6,6 +6,9 @@ import logo from "../../assets/images/logo.webp";
 const CompanyCard = ({ company, index }) => {
   if (!company) return null;
 
+  // Fallback for image until backend serves real images
+  const displayImage = company.logoUrl === 'logo' || !company.logoUrl ? logo : company.logoUrl;
+
   return (
     <div
       // data-aos="fade-up"
@@ -13,11 +16,11 @@ const CompanyCard = ({ company, index }) => {
       // // data-aos-duration="500"
       className="rounded-xl overflow-hidden border-2 border-primary/20 group flex flex-col h-full transition-transform duration-300 ease-out hover:scale-105 cursor-pointer"
     >
-      <Link to={`/company/${company.id}`} className="flex flex-col h-full">
+      <Link to={`/company/${company._id}`} className="flex flex-col h-full">
         {/* Image Container */}
         <div className="h-48 bg-white flex items-center justify-center p-8">
           <img
-            src={company.image}
+            src={displayImage}
             alt={company.name}
             className="max-h-full max-w-full object-contain"
           />

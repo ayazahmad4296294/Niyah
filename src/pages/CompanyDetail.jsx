@@ -19,7 +19,7 @@ const CompanyDetail = () => {
   const [reviewError, setReviewError] = useState(null);
 
   // Find the company based on the dynamic ID
-  const company = companies.find((c) => c.id === parseInt(companyId));
+  const company = companies.find((c) => c._id === companyId);
 
   if (!company) {
     return (
@@ -40,8 +40,8 @@ const CompanyDetail = () => {
     const fetchReviews = async () => {
       if (company) {
         try {
-          // Note: using company.name as the ID since that's how we seeded them
-          const response = await fetch(`/api/reviews/${encodeURIComponent(company.name)}`);
+          // Note: using company._id as the ID for relations
+          const response = await fetch(`/api/reviews/${company._id}`);
           if (!response.ok) {
             throw new Error('Failed to fetch reviews');
           }

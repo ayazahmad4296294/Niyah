@@ -27,12 +27,14 @@ import contactRoutes from './routes/contact.routes.js';
 import reviewRoutes from './routes/review.routes.js';
 import ratingRoutes from './routes/rating.routes.js';
 import complaintRoutes from './routes/complaint.routes.js';
+import companyRoutes from './routes/companyRoutes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/complaints', complaintRoutes);
+app.use('/api/companies', companyRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)

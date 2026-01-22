@@ -4,6 +4,7 @@ import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
 import { FaStar } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
+import { useCompany } from '../../context/CompanyContext';
 
 const RateOrComplaint = () => {
     const location = useLocation();
@@ -12,6 +13,7 @@ const RateOrComplaint = () => {
     const queryParams = new URLSearchParams(location.search);
     const initialMode = queryParams.get('mode') || 'complaint';
     const companyIdFromQuery = queryParams.get('companyId');
+    const { companies } = useCompany();
 
     const [activeTab, setActiveTab] = useState(initialMode);
     const [rating, setRating] = useState(0);
@@ -120,14 +122,6 @@ const RateOrComplaint = () => {
     const inputClass = "w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:border-transparent outline-none transition-all";
     const helperTextClass = "text-xs text-gray-500 mt-1";
 
-    // Dummy data for companies
-    const companies = [
-        { id: "1", name: "Company Alpha" },
-        { id: "2", name: "Beta Solutions" },
-        { id: "3", name: "Gamma Tech" },
-        { id: "4", name: "Delta Services" },
-        { id: "5", name: "Epsilon Dynamics" }
-    ];
 
     const complaintTypes = [
         "Service issue",
@@ -198,7 +192,7 @@ const RateOrComplaint = () => {
                             >
                                 <option value="" disabled>Select a company</option>
                                 {companies.map(company => (
-                                    <option key={company.id} value={company.id}>{company.name}</option>
+                                    <option key={company._id} value={company._id}>{company.name}</option>
                                 ))}
                             </select>
                         </div>

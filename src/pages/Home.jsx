@@ -23,7 +23,7 @@ const Home = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7">
             {companies.slice(0, 4).map((company, index) => (
-              <CompanyCard key={company.id} company={company} index={index} />
+              <CompanyCard key={company._id} company={company} index={index} />
             ))}
           </div>
         </div>
@@ -35,7 +35,7 @@ const Home = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7">
             {companies.slice(4, 8).map((company, index) => (
-              <CompanyCard key={company.id} company={company} index={index} />
+              <CompanyCard key={company._id} company={company} index={index} />
             ))}
           </div>
         </div>

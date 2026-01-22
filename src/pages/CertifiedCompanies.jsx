@@ -40,7 +40,7 @@ const CertifiedCompanies = () => {
                     {/* Render 12 Company Cards */}
                     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16'>
                         {companies.slice(0, 12).map((company, index) => (
-                            <CompanyCard key={company.id} company={company} index={index} />
+                            <CompanyCard key={company._id} company={company} index={index} />
                         ))}
                     </div>
 
