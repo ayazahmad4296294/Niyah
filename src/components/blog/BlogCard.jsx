@@ -7,7 +7,7 @@ const BlogCard = ({ blog, index }) => {
 
     return (
         <div
-            className="rounded-xl overflow-hidden border border-primary/10 flex flex-col h-full transition-all duration-300 shadow-gray-400 hover:shadow-xl"
+            className="rounded-xl overflow-hidden border border-primary/10 flex flex-col h-full transition-transform duration-300 ease-out hover:scale-105"
         >
             {/* Image Section - Using Local Import */}
             <div className="relative h-56 w-full overflow-hidden">
