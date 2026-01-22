@@ -5,24 +5,29 @@ import Review from '../models/Review.js';
 // @access  Public
 export const getAllReviews = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 9;
-        const skip = (page - 1) * limit;
+        const { page = 1, limit = 9, companyIds } = req.query;
+        const skip = (parseInt(page) - 1) * parseInt(limit);
 
-        const totalItems = await Review.countDocuments();
-        const reviews = await Review.find()
+        const query = {};
+        if (companyIds) {
+            const ids = companyIds.split(',');
+            query.companyId = { $in: ids };
+        }
+
+        const totalItems = await Review.countDocuments(query);
+        const reviews = await Review.find(query)
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(limit);
+            .limit(parseInt(limit));
 
         res.status(200).json({
             success: true,
             data: reviews,
             pagination: {
                 totalItems,
-                totalPages: Math.ceil(totalItems / limit),
-                currentPage: page,
-                limit
+                totalPages: Math.ceil(totalItems / parseInt(limit)),
+                currentPage: parseInt(page),
+                limit: parseInt(limit)
             }
         });
     } catch (error) {

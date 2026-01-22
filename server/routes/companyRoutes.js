@@ -182,24 +182,31 @@ router.post('/seed', async (req, res) => {
 // @access  Public
 router.get('/', async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 12;
-        const skip = (page - 1) * limit;
+        const { page = 1, limit = 12, search, category } = req.query;
+        const skip = (parseInt(page) - 1) * parseInt(limit);
 
-        const totalItems = await Company.countDocuments();
-        const companies = await Company.find()
+        const query = {};
+        if (search) {
+            query.name = { $regex: search, $options: 'i' };
+        }
+        if (category) {
+            query.category = category;
+        }
+
+        const totalItems = await Company.countDocuments(query);
+        const companies = await Company.find(query)
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(limit);
+            .limit(parseInt(limit));
 
         res.json({
             success: true,
             data: companies,
             pagination: {
                 totalItems,
-                totalPages: Math.ceil(totalItems / limit),
-                currentPage: page,
-                limit
+                totalPages: Math.ceil(totalItems / parseInt(limit)),
+                currentPage: parseInt(page),
+                limit: parseInt(limit)
             }
         });
     } catch (error) {
