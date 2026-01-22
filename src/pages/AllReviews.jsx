@@ -1,13 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import { CiSearch } from "react-icons/ci";
 import { FaStar, FaUser } from "react-icons/fa6";
-import { ReviewsData } from '../data/reviewData';
+import { useCompany } from '../context/CompanyContext';
 
 const AllReviews = () => {
+  const { companies } = useCompany();
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const keywordStyling = `px-4 py-1 font-normal rounded-lg text-sm md:text-lg bg-primary text-white hover:bg-secondary hover:text-black transition-all duration-300 whitespace-nowrap`;
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch('/api/reviews');
+        const data = await response.json();
+        if (data.success) {
+          setReviews(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReviews();
+  }, []);
 
   return (
     <div className='w-full bg-[#FCFBF3]'>
@@ -60,67 +81,72 @@ const AllReviews = () => {
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16'>
-          {ReviewsData.map((data) => (
-            <div key={data.id} className="h-full">
-              <div className="bg-primary text-white p-6 rounded-xl shadow-lg h-full flex flex-col gap-4 min-h-[220px]">
-                {/* User Info Header */}
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white overflow-hidden shrink-0">
-                    <FaUser size={20} />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <h3 className="font-bold text-lg leading-none">{data.name}</h3>
-                    <div className="flex gap-1 mt-1">
-                      {[...Array(5)].map((_, index) => (
-                        <div
-                          key={index}
-                          className={`w-6 h-6 flex items-center justify-center rounded-sm ${index < data.rating ? "bg-secondary" : "bg-[#D1D5DB]"
-                            }`}
-                        >
-                          <FaStar className="text-white text-[12px]" />
+          {loading ? (
+            <div className="col-span-full text-center py-20">
+              <p className="text-primary text-xl font-bold">Loading Reviews...</p>
+            </div>
+          ) : reviews.length > 0 ? (
+            reviews.map((review) => {
+              const reviewCompany = companies.find(c => c.name === review.companyId);
+              return (
+                <div key={review._id} className="h-full">
+                  <div className="bg-primary text-white p-6 rounded-xl shadow-lg h-full flex flex-col gap-4 min-h-[220px]">
+                    {/* User Info Header */}
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white overflow-hidden shrink-0">
+                        <FaUser size={20} />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <h3 className="font-bold text-lg leading-none">{review.name}</h3>
+                        <div className="flex gap-1 mt-1">
+                          {[...Array(5)].map((_, index) => (
+                            <div
+                              key={index}
+                              className={`w-6 h-6 flex items-center justify-center rounded-sm ${index < review.rating ? "bg-secondary" : "bg-[#D1D5DB]"
+                                }`}
+                            >
+                              <FaStar className="text-white text-[12px]" />
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                    </div>
+
+                    {/* Review Text */}
+                    <div className="grow">
+                      <p className="text-md font-medium text-gray-100">{review.reviewText}</p>
+                    </div>
+
+                    {/* Footer line and Company Data */}
+                    <div className="flex flex-col gap-4">
+                      <hr className="border-white opacity-40" />
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-md bg-white p-1 shrink-0 overflow-hidden">
+                          {reviewCompany ? (
+                            <img
+                              src={reviewCompany.image}
+                              alt={review.companyId}
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gray-200" />
+                          )}
+                        </div>
+                        <div className="flex flex-col overflow-hidden">
+                          <p className="text-sm font-semibold truncate">{review.companyId}</p>
+                          <p className="text-xs text-gray-400 truncate">{reviewCompany?.website || "Website not found"}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-
-                {/* Review Text */}
-                <div className="grow">
-                  <p className="text-md font-medium text-gray-100">{data.text}</p>
-                </div>
-
-                {/* Footer line and Company Data */}
-                <div className="flex flex-col gap-4">
-                  <hr className="border-white opacity-40" />
-                  <div className="flex items-center gap-3">
-                    {data.company ? (
-                      <>
-                        <div className="w-7 h-7 rounded-md bg-white p-1 shrink-0 overflow-hidden">
-                          <img
-                            src={data.company.image}
-                            alt={data.company.name}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                        <div className="flex flex-col overflow-hidden">
-                          <p className="text-sm font-semibold truncate">{data.company.name}</p>
-                          <p className="text-xs text-gray-400 truncate">{data.company.website}</p>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-7 h-7 mt-1 rounded-md bg-white opacity-50 shrink-0"></div>
-                        <div className="flex flex-col gap-1 w-full">
-                          <div className="h-3 bg-gray-500 rounded-sm w-1/2"></div>
-                          <div className="h-2 bg-gray-600 rounded-sm w-3/4"></div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
+              );
+            })
+            ) : (
+              <div className="col-span-full text-center py-20">
+                <p className="text-gray-500">No reviews found.</p>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Pagination Section */}

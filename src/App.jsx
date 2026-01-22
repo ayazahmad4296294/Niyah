@@ -22,13 +22,6 @@ import ScrollToTop from './components/common/ScrollToTop'
 import { AuthProvider } from './context/AuthContext'
 
 const App = () => {
-  // useEffect(() => {
-  //   AOS.init({
-  //     duration: 600,
-  //     once: true,
-  //     easing: 'ease-in-out',
-  //   });
-  // }, []);
 
   return (
     <AuthProvider>

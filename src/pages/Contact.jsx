@@ -1,18 +1,69 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import { HiOutlineMail, HiOutlineClock, HiOutlineGlobeAlt } from 'react-icons/hi';
 
 const Contact = () => {
-    const inputClass = "w-full px-4 py-2.5 mb-2 rounded-xl border border-primary/10 focus:border-primary focus:outline-none transition-colors text-lg bg-gray-50";
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        message: ''
+    });
+
+    const [loading, setLoading] = useState(false);
+
+    const inputClass = "w-full px-4 py-1 mb-1 rounded-xl border border-primary/10 focus:border-primary focus:outline-none transition-colors text-lg bg-gray-50";
     const labelClass = "block text-sm font-semibold text-primary mb-1";
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(data.message);
+                // Reset form fields after successful submit
+                setFormData({
+                    name: '',
+                    email: '',
+                    phone: '',
+                    message: ''
+                });
+            } else {
+                alert(data.message || 'Something went wrong');
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('Failed to connect to the server');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="flex flex-col min-h-screen bg-[#FCFBF3]">
             <Navbar />
 
             <main className="grow flex items-center justify-center pt-32 pb-28 px-6">
-                <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
+                <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-12 items-center">
                     
                     {/* Left Column: Contact Information */}
                     <div className="flex flex-col justify-center space-y-8 order-1">
@@ -60,11 +111,14 @@ const Contact = () => {
 
                     {/* Right Column: Contact Form */}
                     <div className="bg-white p-7 md:px-10 py-8 rounded-2xl shadow-2xl border border-gray-100 order-2">
-                        <form className="flex flex-col gap-5" onSubmit={(e) => e.preventDefault()}>
+                        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
                             <div>
                                 <label className={labelClass}>Name *</label>
                                 <input
                                     type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
                                     placeholder="Enter your name"
                                     className={inputClass}
                                     required
@@ -75,6 +129,9 @@ const Contact = () => {
                                 <label className={labelClass}>Email Address *</label>
                                 <input
                                     type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
                                     placeholder="example@mail.com"
                                     className={inputClass}
                                     required
@@ -85,6 +142,9 @@ const Contact = () => {
                                 <label className={labelClass}>Contact No *</label>
                                 <input
                                     type="text"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
                                     placeholder="Enter your contact number"
                                     className={inputClass}
                                     required
@@ -94,14 +154,22 @@ const Contact = () => {
                             <div>
                                 <label className={labelClass}>Message</label>
                                 <textarea
+                                    name="message"
+                                    value={formData.message}
+                                    onChange={handleChange}
                                     placeholder="How can we help you?"
                                     className={`${inputClass} resize-none`}
                                     rows={3}
+                                    required
                                 />
                             </div>
 
-                            <button className="w-full py-4 bg-primary text-white font-bold rounded-xl text-lg hover:bg-primary/90 transition-all shadow-lg active:scale-95 mt-2">
-                                Send Message
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className={`w-full py-4 bg-primary text-white font-bold rounded-xl text-lg transition-all shadow-lg active:scale-95 ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary/90'}`}
+                            >
+                                {loading ? 'Sending...' : 'Send Message'}
                             </button>
                         </form>
                     </div>

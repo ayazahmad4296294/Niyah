@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCompany } from '../context/CompanyContext';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import { HiOutlineMail, HiOutlineGlobeAlt, HiOutlinePhone, HiOutlineLocationMarker } from 'react-icons/hi';
 import { FaStar, FaUser, FaCircleCheck } from 'react-icons/fa6';
-import { ReviewsData } from '../data/reviewData';
 import ReviewForm from '../components/reviews/ReviewForm';
 
 const CompanyDetail = () => {
   const { companyId } = useParams();
   const { companies } = useCompany();
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+  const [companyReviews, setCompanyReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
 
   // Find the company based on the dynamic ID
   const company = companies.find((c) => c.id === parseInt(companyId));
@@ -31,8 +32,26 @@ const CompanyDetail = () => {
     );
   }
 
-  // Filter reviews for this specific company
-  const companyReviews = ReviewsData.filter(r => r.company.name === company.name);
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (company) {
+        try {
+          // Note: using company.name as the ID since that's how we seeded them
+          const response = await fetch(`/api/reviews/${encodeURIComponent(company.name)}`);
+          const data = await response.json();
+          if (data.success) {
+            setCompanyReviews(data.data);
+          }
+        } catch (error) {
+          console.error('Error fetching reviews:', error);
+        } finally {
+          setLoadingReviews(false);
+        }
+      }
+    };
+
+    fetchReviews();
+  }, [company]);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FCFBF3]">
@@ -181,10 +200,14 @@ const CompanyDetail = () => {
             <h2 className="text-3xl font-bold text-primary w-full md:text-left">Company Reviews</h2>
           </div>
 
-          {companyReviews.length > 0 ? (
+          {loadingReviews ? (
+            <div className="text-center py-10">
+              <p className="text-primary font-semibold">Loading reviews...</p>
+            </div>
+          ) : companyReviews.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {companyReviews.map((review) => (
-                <div key={review.id} className="bg-primary text-white p-6 rounded-xl shadow-md flex flex-col gap-4 min-h-[220px]">
+                <div key={review._id} className="bg-primary text-white p-6 rounded-xl shadow-md flex flex-col gap-4 min-h-[220px]">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white shrink-0">
                       <FaUser size={20} />
@@ -200,7 +223,7 @@ const CompanyDetail = () => {
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm grow text-gray-100 italic">"{review.text}"</p>
+                  <p className="text-sm grow text-gray-100 italic">"{review.reviewText}"</p>
                 </div>
               ))}
             </div>

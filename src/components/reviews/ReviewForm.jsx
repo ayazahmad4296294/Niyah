@@ -10,12 +10,53 @@ const ReviewForm = ({ companyName }) => {
     review: ''
   });
 
-  const handleSubmit = (e) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`Review submitted for ${companyName}!`);
-    // Reset form
-    setFormData({ name: '', email: '', review: '' });
-    setRating(0);
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to submit a review');
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          companyId: companyName, // Using name as ID per current system
+          name: formData.name,
+          email: formData.email,
+          rating: rating,
+          reviewText: formData.review
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Review submitted successfully!');
+        // Reset form
+        setFormData({ name: '', email: '', review: '' });
+        setRating(0);
+        // Reload page to see new review or handle via callback
+        window.location.reload();
+      } else {
+        alert(data.message || 'Failed to submit review');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('Failed to connect to the server');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -79,9 +120,10 @@ const ReviewForm = ({ companyName }) => {
 
         <button
           type="submit"
-          className="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-colors active:scale-95"
+          disabled={loading}
+          className={`bg-primary text-white font-bold py-3 px-8 rounded-lg transition-colors active:scale-95 ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary/90'}`}
         >
-          Submit Review
+          {loading ? 'Submitting...' : 'Submit Review'}
         </button>
       </form>
     </div>

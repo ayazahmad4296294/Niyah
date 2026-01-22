@@ -35,7 +35,7 @@ const AuthForm = () => {
         setMessage('');
 
         const endpoint = isLogin ? '/login' : '/register';
-        const url = `http://localhost:5002/api/auth${endpoint}`;
+        const url = `/api/auth${endpoint}`;
 
         try {
             const response = await axios.post(url, formData);

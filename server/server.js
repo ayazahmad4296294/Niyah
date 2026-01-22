@@ -23,7 +23,12 @@ app.use((req, res, next) => {
 });
 
 import authRoutes from './routes/auth.js';
+import contactRoutes from './routes/contact.routes.js';
+import reviewRoutes from './routes/review.routes.js';
+
 app.use('/api/auth', authRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
