@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../../assets/images/logo.webp';
 
 const BlogCard = ({ blog, index }) => {
     if (!blog) return null;
@@ -8,12 +9,12 @@ const BlogCard = ({ blog, index }) => {
         <div
             className="rounded-xl overflow-hidden border border-primary/10 flex flex-col h-full transition-all duration-300 shadow-gray-400 hover:shadow-xl"
         >
-            {/* Image Section */}
+            {/* Image Section - Using Local Import */}
             <div className="relative h-56 w-full overflow-hidden">
                 <img
-                    src={blog.image}
+                    src={logo}
                     alt={blog.title}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain p-4"
                 />
                 {/* Blog Badge */}
                 <div className="absolute top-4 right-4 bg-secondary text-primary px-3 py-1 rounded-md text-xs font-bold shadow-md">

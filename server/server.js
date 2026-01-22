@@ -29,6 +29,7 @@ import ratingRoutes from './routes/rating.routes.js';
 import complaintRoutes from './routes/complaint.routes.js';
 import companyRoutes from './routes/companyRoutes.js';
 import applicationRoutes from './routes/application.routes.js';
+import blogRoutes from './routes/blog.routes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/contact', contactRoutes);
@@ -37,6 +38,7 @@ app.use('/api/ratings', ratingRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/companyapplications', applicationRoutes);
+app.use('/api/blogs', blogRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
