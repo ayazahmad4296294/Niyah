@@ -10,17 +10,24 @@ const ReviewCard = () => {
    const { companies } = useCompany();
    const [reviews, setReviews] = useState([]);
    const [loading, setLoading] = useState(true);
+   const [error, setError] = useState(null);
 
    useEffect(() => {
       const fetchReviews = async () => {
          try {
             const response = await fetch('/api/reviews');
+            if (!response.ok) {
+               throw new Error('Failed to fetch reviews');
+            }
             const data = await response.json();
             if (data.success) {
                setReviews(data.data);
+            } else {
+               setError('Failed to load reviews');
             }
          } catch (error) {
             console.error('Error fetching reviews:', error);
+            setError('Unable to load recent reviews.');
          } finally {
             setLoading(false);
          }
@@ -57,11 +64,9 @@ const ReviewCard = () => {
    };
 
    return (
-      <div className=" overflow-hidden pb-12">
+      <div className="overflow-hidden pb-12">
          <div className="max-w-7xl mx-auto px-1">
-            {/* <h4
-                    className="text-2xl text-primary inline-block mb-6"
-                >Recent Reviews</h4> */}
+
             {/* Header Section */}
             <div className="flex items-center justify-between mb-6">
                <h2 className="text-2xl text-primary font-semibold inline-block">
@@ -76,25 +81,35 @@ const ReviewCard = () => {
             <div className="recent-reviews-slider">
                {loading ? (
                   <div className="text-center py-10 text-primary font-bold">Loading Reviews...</div>
+               ) : error ? (
+                  <div className="text-center py-10 text-red-500 font-bold">{error}</div>
                ) : reviews.length > 0 ? (
                      <Slider {...settings}>
                         {reviews.map((review) => {
                            const reviewCompany = companies.find(c => c.name === review.companyId);
+
+                           // Fallback values in case data is missing
+                           const reviewerName = review.name || "Anonymous";
+                           const reviewerRating = review.rating || 5;
+                           const reviewText = review.reviewText || "No review text.";
+                           const companyName = review.companyId || "Unknown Company";
+                           const companyWebsite = reviewCompany?.website || "Website not found";
+
                            return (
-                              <div key={review._id} className="px-3">
-                                 <div className="bg-primary text-white p-6 rounded-xl shadow-lg h-full flex flex-col gap-4 min-h-[220px]">
+                              <div key={review._id} className="px-3 h-full">
+                                 <div className="bg-primary text-white p-6 rounded-xl shadow-lg flex flex-col gap-4 min-h-[230px] h-full">
                                     {/* User Info Header */}
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-4 shrink-0">
                                        <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white overflow-hidden shrink-0">
                                           <FaUser size={20} />
                                        </div>
-                                       <div className="flex flex-col gap-1">
-                                          <h3 className="font-bold text-lg leading-none">{review.name}</h3>
+                                       <div className="flex flex-col gap-1 overflow-hidden">
+                                          <h3 className="font-bold text-lg leading-none truncate">{reviewerName}</h3>
                                           <div className="flex gap-1 mt-1">
                                              {[...Array(5)].map((_, index) => (
                                                 <div
                                                    key={index}
-                                                className={`w-6 h-6 flex items-center justify-center rounded-sm ${index < review.rating ? "bg-secondary" : "bg-[#D1D5DB]"
+                                                   className={`w-6 h-6 flex items-center justify-center rounded-sm ${index < reviewerRating ? "bg-secondary" : "bg-[#D1D5DB]"
                                                    }`}
                                              >
                                                 <FaStar className="text-white text-[12px]" />
@@ -104,20 +119,22 @@ const ReviewCard = () => {
                                        </div>
                                     </div>
 
-                                    {/* Review Text */}
-                                    <div className="">
-                                       <p className="text-md font-medium text-gray-100">{review.reviewText}</p>
+                                    {/* Review Text - with line clamp for overflow protection */}
+                                    <div className="grow">
+                                       <p className="text-md font-medium text-gray-100 line-clamp-4 wrap-break-word">
+                                          {reviewText}
+                                       </p>
                                     </div>
 
                                     {/* Footer line and Company Data */}
-                                    <div className="flex flex-col gap-4">
+                                    <div className="flex flex-col gap-4 shrink-0 mt-auto">
                                        <hr className="border-white opacity-90" />
                                        <div className="flex items-center gap-3">
-                                       <div className="w-7 h-7 rounded-md bg-white p-1 shrink-0 overflow-hidden">
-                                             {reviewCompany ? (
+                                          <div className="w-7 h-7 rounded-md bg-white p-1 shrink-0 overflow-hidden flex items-center justify-center">
+                                             {reviewCompany && reviewCompany.image ? (
                                                 <img
                                                    src={reviewCompany.image}
-                                                   alt={review.companyId}
+                                                   alt={companyName}
                                                    className="w-full h-full object-contain"
                                                 />
                                              ) : (
@@ -125,8 +142,8 @@ const ReviewCard = () => {
                                              )}
                                           </div>
                                        <div className="flex flex-col overflow-hidden">
-                                             <p className="text-sm font-semibold truncate">{review.companyId}</p>
-                                             <p className="text-xs text-gray-400 truncate">{reviewCompany?.website || "Website not found"}</p>
+                                             <p className="text-sm font-semibold truncate">{companyName}</p>
+                                             <p className="text-xs text-gray-400 truncate">{companyWebsite}</p>
                                           </div>
                                        </div>
                                     </div>
@@ -143,5 +160,6 @@ const ReviewCard = () => {
       </div>
    );
 }
+
 
 export default ReviewCard

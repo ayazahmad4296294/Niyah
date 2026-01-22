@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { useCompany } from '../context/CompanyContext';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
@@ -10,9 +11,12 @@ import ReviewForm from '../components/reviews/ReviewForm';
 const CompanyDetail = () => {
   const { companyId } = useParams();
   const { companies } = useCompany();
+  const { user } = useAuth(); // Get user from AuthContext
+  const navigate = useNavigate(); // Use navigate for redirection
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [companyReviews, setCompanyReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
+  const [reviewError, setReviewError] = useState(null);
 
   // Find the company based on the dynamic ID
   const company = companies.find((c) => c.id === parseInt(companyId));
@@ -38,12 +42,18 @@ const CompanyDetail = () => {
         try {
           // Note: using company.name as the ID since that's how we seeded them
           const response = await fetch(`/api/reviews/${encodeURIComponent(company.name)}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch reviews');
+          }
           const data = await response.json();
           if (data.success) {
             setCompanyReviews(data.data);
+          } else {
+            setReviewError('Failed to load reviews.');
           }
         } catch (error) {
           console.error('Error fetching reviews:', error);
+          setReviewError('Unable to load reviews for this company.');
         } finally {
           setLoadingReviews(false);
         }
@@ -52,6 +62,18 @@ const CompanyDetail = () => {
 
     fetchReviews();
   }, [company]);
+
+  const handleReviewClick = () => {
+    if (!user) {
+      // If not logged in, redirect to login page with return URL state
+      // Alternatively, could show a modal, but redirection is standard
+      if (window.confirm("You must be logged in to write a review. Go to login page?")) {
+        navigate('/login');
+      }
+      return;
+    }
+    setIsReviewFormOpen(!isReviewFormOpen);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FCFBF3]">
@@ -204,6 +226,10 @@ const CompanyDetail = () => {
             <div className="text-center py-10">
               <p className="text-primary font-semibold">Loading reviews...</p>
             </div>
+          ) : reviewError ? (
+            <div className="text-center py-10">
+              <p className="text-red-500 font-semibold">{reviewError}</p>
+            </div>
           ) : companyReviews.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {companyReviews.map((review) => (
@@ -236,7 +262,7 @@ const CompanyDetail = () => {
           {/* Review Action Buttons BELOW the grid */}
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-6">
             <button
-              onClick={() => setIsReviewFormOpen(!isReviewFormOpen)}
+              onClick={handleReviewClick}
               className="bg-primary text-white font-bold py-3 px-8 rounded-xl hover:bg-primary/90 transition-all shadow-lg active:scale-95 w-full sm:w-auto"
             >
               {isReviewFormOpen ? "Cancel Review" : "Write a Review"}

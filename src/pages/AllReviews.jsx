@@ -12,17 +12,24 @@ const AllReviews = () => {
   const [loading, setLoading] = useState(true);
 
   const keywordStyling = `px-4 py-1 font-normal rounded-lg text-sm md:text-lg bg-primary text-white hover:bg-secondary hover:text-black transition-all duration-300 whitespace-nowrap`;
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
         const response = await fetch('/api/reviews');
+        if (!response.ok) {
+          throw new Error('Failed to fetch reviews');
+        }
         const data = await response.json();
         if (data.success) {
           setReviews(data.data);
+        } else {
+          setError('Failed to load reviews.');
         }
       } catch (error) {
         console.error('Error fetching reviews:', error);
+        setError('Unable to load reviews at this time.');
       } finally {
         setLoading(false);
       }
@@ -84,6 +91,10 @@ const AllReviews = () => {
           {loading ? (
             <div className="col-span-full text-center py-20">
               <p className="text-primary text-xl font-bold">Loading Reviews...</p>
+            </div>
+          ) : error ? (
+            <div className="col-span-full text-center py-20">
+              <p className="text-red-500 text-xl font-bold">{error}</p>
             </div>
           ) : reviews.length > 0 ? (
             reviews.map((review) => {
