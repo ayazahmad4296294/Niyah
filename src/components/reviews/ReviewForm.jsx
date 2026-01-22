@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaStar } from 'react-icons/fa6';
+import { useAuth } from '../../context/AuthContext';
 
 const ReviewForm = ({ companyName }) => {
+  const { user } = useAuth();
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [formData, setFormData] = useState({
@@ -9,6 +11,17 @@ const ReviewForm = ({ companyName }) => {
     email: '',
     review: ''
   });
+
+  // Pre-fill user data if logged in
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || '',
+        email: user.email || ''
+      }));
+    }
+  }, [user]);
 
   const [loading, setLoading] = useState(false);
 
@@ -43,10 +56,14 @@ const ReviewForm = ({ companyName }) => {
 
       if (data.success) {
         alert('Review submitted successfully!');
-        // Reset form
-        setFormData({ name: '', email: '', review: '' });
+        // Reset form to user defaults
+        setFormData({
+          name: user?.name || '',
+          email: user?.email || '',
+          review: ''
+        });
         setRating(0);
-        // Reload page to see new review or handle via callback
+        // Reload page to see new review
         window.location.reload();
       } else {
         alert(data.message || 'Failed to submit review');

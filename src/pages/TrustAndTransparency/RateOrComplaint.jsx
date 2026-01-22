@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
 import { FaStar } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
 
 const RateOrComplaint = () => {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { user } = useAuth();
     const queryParams = new URLSearchParams(location.search);
     const initialMode = queryParams.get('mode') || 'complaint';
     const companyIdFromQuery = queryParams.get('companyId');
@@ -14,12 +17,104 @@ const RateOrComplaint = () => {
     const [rating, setRating] = useState(0);
     const [hover, setHover] = useState(0);
 
+    // Form State
+    const [formData, setFormData] = useState({
+        companyId: companyIdFromQuery || "",
+        fullName: "",
+        email: "",
+        complaintType: "",
+        message: ""
+    });
+    const [status, setStatus] = useState({ loading: false, type: null, message: null });
+
+    // Sync validation with user data if logged in
+    useEffect(() => {
+        if (user) {
+            setFormData(prev => ({
+                ...prev,
+                fullName: user.name || "",
+                email: user.email || ""
+            }));
+        }
+    }, [user]);
+
     // Sync tab with URL if needed, or just set initial
     useEffect(() => {
         if (initialMode === 'rate' || initialMode === 'complaint') {
             setActiveTab(initialMode);
         }
     }, [initialMode]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const resetForm = () => {
+        setRating(0);
+        setFormData({
+            companyId: "",
+            fullName: user?.name || "",
+            email: user?.email || "",
+            complaintType: "",
+            message: ""
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setStatus({ loading: true, type: null, message: null });
+
+        if (!user) {
+            if (window.confirm("You must be logged in to submit. Go to login page?")) {
+                navigate('/login');
+            }
+            setStatus({ loading: false, type: null, message: null });
+            return;
+        }
+
+        const endpoint = activeTab === 'rate' ? '/api/ratings' : '/api/complaints';
+        const payload = {
+            companyId: formData.companyId,
+            fullName: formData.fullName,
+            email: formData.email,
+            rating: rating,
+            message: formData.message
+        };
+
+        if (activeTab === 'complaint') {
+            payload.complaintType = formData.complaintType;
+        }
+
+        try {
+            const token = localStorage.getItem('token'); // Assuming token is here based on other files
+            console.log("Submitting to", endpoint, payload);
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Submission failed');
+            }
+
+            setStatus({ loading: false, type: 'success', message: data.message || 'Submitted successfully!' });
+            resetForm();
+            // Clear success message after 3 seconds
+            setTimeout(() => setStatus(prev => ({ ...prev, type: null, message: null })), 5000);
+
+        } catch (error) {
+            console.error(error);
+            setStatus({ loading: false, type: 'error', message: error.message || 'An error occurred.' });
+        }
+    };
 
     const labelClass = "block text-sm font-medium text-gray-700 mb-1";
     const inputClass = "w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary focus:border-transparent outline-none transition-all";
@@ -84,13 +179,22 @@ const RateOrComplaint = () => {
                         </p>
                     </div>
 
-                    <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+                    {status.message && (
+                        <div className={`mb-6 p-4 rounded-lg text-center ${status.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                            {status.message}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         {/* 1. Select Company */}
                         <div>
                             <label className={labelClass}>Select Company *</label>
                             <select
+                                name="companyId"
                                 className={inputClass}
-                                defaultValue={companyIdFromQuery || ""}
+                                value={formData.companyId}
+                                onChange={handleChange}
+                                required
                             >
                                 <option value="" disabled>Select a company</option>
                                 {companies.map(company => (
@@ -102,13 +206,29 @@ const RateOrComplaint = () => {
                         {/* 2. Full Name */}
                         <div>
                             <label className={labelClass}>Full Name *</label>
-                            <input type="text" className={inputClass} placeholder="Your full name" />
+                            <input
+                                type="text"
+                                name="fullName"
+                                className={inputClass}
+                                placeholder="Your full name"
+                                value={formData.fullName}
+                                onChange={handleChange}
+                                required
+                            />
                         </div>
 
                         {/* 3. Contact Email */}
                         <div>
                             <label className={labelClass}>Contact Email *</label>
-                            <input type="email" className={inputClass} placeholder="your@email.com" />
+                            <input
+                                type="email"
+                                name="email"
+                                className={inputClass}
+                                placeholder="your@email.com"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
                         </div>
 
                         {/* 4. Rating */}
@@ -132,16 +252,23 @@ const RateOrComplaint = () => {
                                     );
                                 })}
                             </div>
+                            {rating === 0 && <p className="text-xs text-red-500 mt-1">Please select a rating.</p>}
                         </div>
 
                         {/* 5. Complaint Type (Conditional) */}
                         {activeTab === 'complaint' && (
                             <div>
                                 <label className={labelClass}>Complaint Type *</label>
-                                <select className={inputClass} defaultValue="">
+                                <select
+                                    name="complaintType"
+                                    className={inputClass}
+                                    value={formData.complaintType}
+                                    onChange={handleChange}
+                                    required={activeTab === 'complaint'}
+                                >
                                     <option value="" disabled>Select type</option>
-                                    {complaintTypes.map(type => (
-                                        <option key={type} value={type}>{type}</option>
+                                    {complaintTypes.map(type => ( // Lowercase mapping for backend enum match if needed, but display title case
+                                        <option key={type} value={type.toLowerCase()}>{type}</option>
                                     ))}
                                 </select>
                             </div>
@@ -151,40 +278,29 @@ const RateOrComplaint = () => {
                         <div>
                             <label className={labelClass}>Description / Message</label>
                             <textarea
+                                name="message"
                                 rows="5"
                                 className={inputClass}
                                 placeholder={activeTab === 'rate' ? "Write your review here..." : "Describe the issue in detail..."}
+                                value={formData.message}
+                                onChange={handleChange}
                             ></textarea>
                         </div>
 
-                        {/* 7. File Upload (Optional) */}
-                        <div>
-                            <label className={labelClass}>Upload Supporting File (Optional)</label>
-                            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-primary transition-colors cursor-pointer group">
-                                <div className="space-y-1 text-center font-inter">
-                                    <svg className="mx-auto h-12 w-12 text-gray-400 group-hover:text-primary transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                    <div className="flex text-sm text-gray-600">
-                                        <span className="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none">
-                                            Upload a file
-                                        </span>
-                                        <p className="pl-1 text-gray-500">or drag and drop</p>
-                                    </div>
-                                    <p className="text-xs text-gray-400">JPG, PNG, PDF up to 10MB</p>
-                                </div>
-                            </div>
-                        </div>
+                        {/* 7. File Upload (Optional) - DISABLED FOR NOW AS REQUESTED (Text only phase) */}
 
-                        {/* 8. CAPTCHA */}
-                        <div className="flex flex-col items-center pt-4">
+                        {/* 8. CAPTCHA - VISUAL ONLY FOR NOW */}
+                        <div className="flex flex-col items-center pt-4 opacity-50 pointer-events-none grayscale">
+                            {/* Reduced opacity to indicate not active yet */}
                             <div className="px-6 py-4 bg-gray-50 rounded-xl border border-gray-200 flex items-center gap-3">
                                 <input
                                     type="checkbox"
                                     id="captcha"
                                     className="w-5 h-5 rounded cursor-pointer accent-primary"
+                                    checked
+                                    readOnly
                                 />
-                                <label htmlFor="captcha" className="text-sm font-medium text-gray-600 cursor-pointer select-none">
+                                <label htmlFor="captcha" className="text-sm font-medium text-gray-600 select-none">
                                     I am not a robot
                                 </label>
                                 <div className="ml-auto">
@@ -199,8 +315,16 @@ const RateOrComplaint = () => {
 
                         {/* Submit Button */}
                         <div className="flex justify-center pt-4">
-                            <button type="submit" className="w-full max-w-sm py-4 bg-primary text-white font-bold rounded-xl shadow-lg hover:bg-primary/95 hover:shadow-xl transform active:scale-[0.98] transition-all text-lg cursor-pointer">
-                                {activeTab === 'rate' ? 'Submit Rating' : 'Submit Complaint'}
+                            <button
+                                type="submit"
+                                disabled={status.loading || rating === 0}
+                                className={`w-full max-w-sm py-4 bg-primary text-white font-bold rounded-xl shadow-lg hover:bg-primary/95 hover:shadow-xl transform active:scale-[0.98] transition-all text-lg cursor-pointer flex justify-center items-center ${status.loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            >
+                                {status.loading ? (
+                                    <span className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-white"></span>
+                                ) : (
+                                    activeTab === 'rate' ? 'Submit Rating' : 'Submit Complaint'
+                                )}
                             </button>
                         </div>
                     </form>

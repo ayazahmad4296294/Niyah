@@ -25,10 +25,14 @@ app.use((req, res, next) => {
 import authRoutes from './routes/auth.js';
 import contactRoutes from './routes/contact.routes.js';
 import reviewRoutes from './routes/review.routes.js';
+import ratingRoutes from './routes/rating.routes.js';
+import complaintRoutes from './routes/complaint.routes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/ratings', ratingRoutes);
+app.use('/api/complaints', complaintRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
