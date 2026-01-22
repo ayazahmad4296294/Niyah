@@ -55,7 +55,7 @@ const AllReviews = () => {
       <Navbar />
 
       {/* Header Section (Reusing Home/Header layout) */}
-      <div className='w-full flex flex-col items-center justify-center pt-32 pb-16 px-6'>
+      <div className='w-full flex flex-col items-center justify-center py-28 px-6'>
         <div className='text-center mb-8'>
           <h1 className='text-4xl md:text-4xl font-bold text-primary mb-3'>
             Find a company you can trust
