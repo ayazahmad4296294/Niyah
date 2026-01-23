@@ -9,6 +9,7 @@ import { useCompany } from "../../context/CompanyContext";
 const ReviewCard = () => {
    const { companies } = useCompany();
    const [reviews, setReviews] = useState([]);
+   const [totalReviews, setTotalReviews] = useState(0);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
 
@@ -22,6 +23,7 @@ const ReviewCard = () => {
             const data = await response.json();
             if (data.success) {
                setReviews(data.data);
+               setTotalReviews(data.pagination?.totalItems || data.data.length);
             } else {
                setError('Failed to load reviews');
             }
@@ -73,7 +75,7 @@ const ReviewCard = () => {
                   Customer Reviews
                </h2>
                <Link to="/reviews" className="px-3 py-1 bg-secondary text-white rounded-full text-md hover:bg-secondary/90 transition-colors">
-                  {reviews.length} Reviews
+                  {totalReviews} Reviews
                </Link>
             </div>
 
@@ -86,13 +88,16 @@ const ReviewCard = () => {
                ) : reviews.length > 0 ? (
                      <Slider {...settings}>
                         {reviews.map((review) => {
-                           const reviewCompany = companies.find(c => c.name === review.companyId);
+                           // companyId is the _id from mongodb
+                           const reviewCompany = companies.find(c => c._id === review.companyId);
 
                            // Fallback values in case data is missing
                            const reviewerName = review.name || "Anonymous";
                            const reviewerRating = review.rating || 5;
                            const reviewText = review.reviewText || "No review text.";
-                           const companyName = review.companyId || "Unknown Company";
+                           // If reviewCompany found, use its name, otherwise fallback to "Unknown Company". 
+                           // Do NOT use companyId as name.
+                           const companyName = reviewCompany?.name || "Unknown Company";
                            const companyWebsite = reviewCompany?.website || "Website not found";
 
                            return (

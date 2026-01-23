@@ -19,27 +19,17 @@ const CompanyDetail = () => {
   const [reviewError, setReviewError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 9;
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const [limit, setLimit] = useState(4); // Default to 4 reviews initially
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Find the company based on the dynamic ID
   const company = companies.find((c) => c._id === companyId);
 
-  if (!company) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <div className="grow flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-primary mb-4">Company Not Found</h1>
-            <p className="text-lg text-gray-600">The company you are looking for does not exist or has been removed.</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
+  // Move useEffect UP so it is not conditional
   useEffect(() => {
+    if (!company?._id) return; // Guard clause inside the effect
+
     const fetchReviews = async () => {
       setLoadingReviews(true);
       try {
@@ -63,15 +53,12 @@ const CompanyDetail = () => {
       }
     };
 
-    if (company._id) {
-      fetchReviews();
-    }
-  }, [company._id, currentPage]);
+    fetchReviews();
+  }, [company?._id, currentPage, limit, refreshTrigger]);
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
-      // Optional: scroll to reviews section
     }
   };
 
@@ -85,6 +72,21 @@ const CompanyDetail = () => {
     setIsReviewFormOpen(!isReviewFormOpen);
   };
 
+  if (!company) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <div className="grow flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-primary mb-4">Company Not Found</h1>
+            <p className="text-lg text-gray-600">The company you are looking for does not exist or has been removed.</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-[#FCFBF3]">
       <Navbar />
@@ -96,8 +98,8 @@ const CompanyDetail = () => {
 
           {/* Left (50%): Company Overview */}
           <div className="w-full lg:w-[60%]">
-            <section className="bg-white rounded-2xl shadow-sm p-8 md:p-10 border border-primary/5 h-full">
-              <h2 className="text-2xl font-bold text-primary mb-8 border-b border-gray-100 pb-4">Overview</h2>
+            <section className="bg-white rounded-2xl shadow-sm p-8 md:p-10 border border-gray-400 h-full">
+              <h2 className="text-2xl font-bold text-primary mb-8 border-b border-gray-300 pb-4">Overview</h2>
 
               <div className="space-y-6">
                 <div>
@@ -158,7 +160,7 @@ const CompanyDetail = () => {
 
           {/* Right (50%): Company Location Map */}
           <div className="w-full lg:w-[40%]">
-            <div className="bg-white rounded-2xl shadow-sm border border-primary/5 p-4 overflow-hidden h-full flex flex-col">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-400 p-4 overflow-hidden h-full flex flex-col">
               <div className="grow w-full bg-gray-100 rounded-xl relative flex items-center justify-center overflow-hidden min-h-[300px]">
                 <iframe
                   title="Map Location"
@@ -180,7 +182,7 @@ const CompanyDetail = () => {
 
           {/* Left (50%): Verification Card */}
           <div className="w-full lg:w-1/2">
-            <div className="bg-white rounded-2xl shadow-sm border border-primary/5 p-8 flex flex-col items-center text-center h-full justify-center">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-400 p-8 flex flex-col items-center text-center h-full justify-center">
               <div className="w-20 h-20 bg-primary/5 rounded-2xl p-4 mb-6 flex items-center justify-center border border-primary/5">
                 {/* Fallback to text if no image (since we don't store images in DB) */}
                 <span className="text-3xl font-bold text-primary">{company.name.charAt(0)}</span>
@@ -210,9 +212,9 @@ const CompanyDetail = () => {
 
           {/* Right (50%): Seal Verification Block */}
           <div className="w-full lg:w-1/2">
-            <div className="bg-white rounded-2xl shadow-sm border border-primary/5 p-8 text-center space-y-6 h-full flex flex-col justify-center">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-400 p-8 text-center space-y-6 h-full flex flex-col justify-center">
               <h4 className="text-md font-bold text-primary uppercase tracking-widest">Seal Verification</h4>
-              <div className="flex justify-center gap-8 items-center bg-gray-50 p-6 rounded-2xl border border-dashed border-primary/10">
+              <div className="flex justify-center gap-8 items-center bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-200">
                 <div className="w-24 h-24 bg-white p-2 rounded-lg border border-gray-200">
                   <div className="w-full h-full bg-[url('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=NiyahVerification')] bg-cover bg-center"></div>
                 </div>
@@ -233,7 +235,7 @@ const CompanyDetail = () => {
             <h2 className="text-3xl font-bold text-primary w-full md:text-left">Company Reviews</h2>
           </div>
 
-          {loadingReviews ? (
+          {loadingReviews && companyReviews.length === 0 ? (
             <div className="text-center py-10">
               <p className="text-primary font-semibold">Loading reviews...</p>
             </div>
@@ -243,7 +245,7 @@ const CompanyDetail = () => {
             </div>
           ) : companyReviews.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {companyReviews.map((review) => (
                       <div key={review._id} className="bg-primary text-white p-6 rounded-xl shadow-md flex flex-col gap-4 min-h-[220px]">
                         <div className="flex items-center gap-4">
@@ -266,8 +268,23 @@ const CompanyDetail = () => {
                     ))}
                   </div>
 
-                  {/* Pagination Controls */}
-                  {totalPages > 1 && (
+                  {/* See All Button */}
+                  {!showAllReviews && totalPages > 1 && (
+                    <div className='flex items-center justify-center mt-8'>
+                      <button
+                        onClick={() => {
+                          setShowAllReviews(true);
+                          setLimit(9); // Increase limit or 100 to show more, logic handles in useEffect
+                        }}
+                        className="bg-secondary text-primary font-bold py-2 px-6 rounded-lg shadow hover:bg-secondary/90 transition-colors"
+                      >
+                        See All Reviews
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Pagination Controls - Only show if showing all reviews */}
+                  {showAllReviews && totalPages > 1 && (
                     <div className='flex items-center justify-center gap-2 mt-8'>
                       <button
                         onClick={() => handlePageChange(currentPage - 1)}
@@ -304,7 +321,7 @@ const CompanyDetail = () => {
           )}
 
           {/* Review Action Buttons BELOW the grid */}
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
             <button
               onClick={handleReviewClick}
               className="bg-primary text-white font-bold py-3 px-8 rounded-xl hover:bg-primary/90 transition-all shadow-lg active:scale-95 w-full sm:w-auto"
@@ -312,41 +329,51 @@ const CompanyDetail = () => {
               {isReviewFormOpen ? "Cancel Review" : "Write a Review"}
             </button>
           </div>
+        </section>
 
+        {/* Combined Container for Form and CTA */}
+        <div className={`flex flex-col ${isReviewFormOpen ? 'lg:flex-row items-stretch' : ''} gap-8`}>
+
+          {/* Review Form Section (Left Side when open) */}
           {isReviewFormOpen && (
-            <div className="mt-8 mb-4">
-              <ReviewForm companyName={company.name} companyId={company._id} />
+            <div className="w-full lg:w-1/2 transition-all duration-300 ease-in-out">
+              <ReviewForm
+                companyName={company.name}
+                companyId={company._id}
+                onReviewSubmitted={() => {
+                  setIsReviewFormOpen(false);
+                  setCurrentPage(1);
+                  setRefreshTrigger(prev => prev + 1);
+                }}
+              />
             </div>
           )}
-        </section>
 
-        {/* RATE & COMPLAINT CTA (Full Width) */}
-        <section className="bg-primary p-8 md:p-12 rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-8 border-4 border-secondary/10">
-          <div className="text-white text-center md:text-left">
-            <h3 className="text-3xl font-bold mb-3">Rate or Report This Company</h3>
-            <p className="text-lg text-white/70">Help the community by sharing your feedback or filing an official complaint.</p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-            <Link
-              to={`/file-complaint?mode=rate&companyId=${company.id}`}
-              className="px-8 py-4 bg-secondary text-primary font-bold rounded-2xl text-center hover:bg-secondary/90 transition-all shadow-lg active:scale-95"
-            >
-              Rate This Company
-            </Link>
-            <Link
-              to={`/file-complaint?mode=complaint&companyId=${company.id}`}
-              className="px-8 py-4 bg-white text-primary font-bold rounded-2xl text-center hover:bg-gray-100 transition-all shadow-lg active:scale-95 border-2 border-primary/5"
-            >
-              File a Complaint
-            </Link>
-          </div>
-        </section>
+          {/* RATE & COMPLAINT CTA (Right Side when form is open, Full Width otherwise) */}
+          <section className={`${isReviewFormOpen ? 'lg:w-1/2' : 'w-full'} bg-primary p-8 md:p-12 rounded-3xl shadow-xl flex flex-col items-center justify-center gap-8 border-4 border-secondary/10 transition-all duration-300`}>
 
-        {/* Footer Extension for Company Detail */}
-        <div className="pt-10 border-t border-gray-200 flex justify-center">
-          <Link to="/reviews" className="text-primary bg-secondary px-8 py-4 rounded-2xl font-bold text-lg hover:bg-secondary/90 transition-all shadow-lg active:scale-95">
-            See All Company Reviews
-          </Link>
+            <div className="text-white text-center">
+              <h3 className="text-3xl font-bold mb-3">Rate or Report This Company</h3>
+              <p className="text-lg text-white/70 w-full">Help the community by sharing your feedback or filing an official complaint.</p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto shrink-0">
+              <Link
+                to={`/file-complaint?mode=rate&companyId=${company._id}`}
+                className="px-5 py-3 bg-secondary text-primary font-bold rounded-2xl text-center hover:bg-secondary/90 transition-all shadow-lg active:scale-95 whitespace-nowrap"
+              >
+                Rate This Company
+              </Link>
+              <Link
+                to={`/file-complaint?mode=complaint&companyId=${company._id}`}
+                className="px-5 py-3 bg-white text-primary font-bold rounded-2xl text-center hover:bg-gray-100 transition-all shadow-lg active:scale-95 border-2 border-primary/5 whitespace-nowrap"
+              >
+                File a Complaint
+              </Link>
+            </div>
+
+          </section>
+
         </div>
       </div>
 

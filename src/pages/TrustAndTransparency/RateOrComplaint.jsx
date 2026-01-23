@@ -29,6 +29,10 @@ const RateOrComplaint = () => {
     });
     const [status, setStatus] = useState({ loading: false, type: null, message: null });
 
+    // State for Searchable Dropdown
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+
     // Sync validation with user data if logged in
     useEffect(() => {
         if (user) {
@@ -47,6 +51,13 @@ const RateOrComplaint = () => {
         }
     }, [initialMode]);
 
+    // Update formData if companyId changes in URL (e.g. user navigates while on page)
+    useEffect(() => {
+        if (companyIdFromQuery) {
+            setFormData(prev => ({ ...prev, companyId: companyIdFromQuery }));
+        }
+    }, [companyIdFromQuery]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -61,6 +72,7 @@ const RateOrComplaint = () => {
             complaintType: "",
             message: ""
         });
+        setSearchTerm("");
     };
 
     const handleSubmit = async (e) => {
@@ -133,12 +145,20 @@ const RateOrComplaint = () => {
         "Other"
     ];
 
+    // --- Searchable Dropdown Helper ---
+    const filteredCompanies = companies.filter(company =>
+        company.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const selectedCompany = companies.find(c => c._id === formData.companyId);
+
     return (
-        <div className="bg-gray-50 min-h-screen flex flex-col">
+        <div className="bg-gray-50 min-h-screen flex flex-col" onClick={() => setIsDropdownOpen(false)}>
             <Navbar />
 
             <main className="grow max-w-3xl mx-auto py-20 px-4 md:px-10 w-full">
                 {/* Tabs */}
+                {/* ... (tabs logic remains same) */}
                 <div className="flex border-b border-gray-200 mb-8">
                     <button
                         onClick={() => setActiveTab('rate')}
@@ -180,21 +200,90 @@ const RateOrComplaint = () => {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* 1. Select Company */}
-                        <div>
+                        {/* 1. Select Company (Searchable) */}
+                        <div className="relative" onClick={(e) => e.stopPropagation()}>
                             <label className={labelClass}>Select Company *</label>
-                            <select
-                                name="companyId"
-                                className={inputClass}
-                                value={formData.companyId}
-                                onChange={handleChange}
-                                required
+
+                            {/* Main Display Area */}
+                            <div
+                                className={`${inputClass} cursor-pointer flex justify-between items-center group ${isDropdownOpen ? 'ring-1 ring-primary' : ''}`}
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                             >
-                                <option value="" disabled>Select a company</option>
-                                {companies.map(company => (
-                                    <option key={company._id} value={company._id}>{company.name}</option>
-                                ))}
-                            </select>
+                                <span className={selectedCompany ? "text-gray-900" : "text-gray-400"}>
+                                    {selectedCompany ? selectedCompany.name : "Select a company..."}
+                                </span>
+                                <svg
+                                    className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+
+                            {/* Dropdown Menu */}
+                            {isDropdownOpen && (
+                                <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                                    {/* Search Input */}
+                                    <div className="p-3 border-b border-gray-100 bg-gray-50">
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                className="w-full p-2 pl-9 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
+                                                placeholder="Search companies..."
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                autoFocus
+                                            />
+                                            <svg
+                                                className="absolute left-3 top-2.5 w-4 h-4 text-gray-400"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    {/* Results List */}
+                                    <div className="max-h-50 overflow-y-auto py-1 custom-scrollbar">
+                                        {filteredCompanies.length > 0 ? (
+                                            filteredCompanies.map(company => (
+                                                <div
+                                                    key={company._id}
+                                                    className={`px-4 py-2.5 hover:bg-primary/5 cursor-pointer transition-colors flex items-center justify-between ${formData.companyId === company._id ? 'bg-primary/10 text-primary font-semibold' : 'text-gray-700'}`}
+                                                    onClick={() => {
+                                                        setFormData(prev => ({ ...prev, companyId: company._id }));
+                                                        setIsDropdownOpen(false);
+                                                        setSearchTerm("");
+                                                    }}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-xs font-bold uppercase">
+                                                            {company.name.charAt(0)}
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-sm">{company.name}</span>
+                                                            <span className="text-[10px] text-gray-400 leading-tight">{company.category}</span>
+                                                        </div>
+                                                    </div>
+                                                    {formData.companyId === company._id && (
+                                                        <svg className="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                        </svg>
+                                                    )}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="px-4 py-8 text-center text-gray-400 flex flex-col items-center gap-2">
+                                                <svg className="w-8 h-8 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span className="text-sm">No companies found</span>
+                                            </div>
+                                        )}
+                                </div>
+                                </div>
+                            )}
+                        <input type="hidden" name="companyId" value={formData.companyId} required />
                         </div>
 
                         {/* 2. Full Name */}

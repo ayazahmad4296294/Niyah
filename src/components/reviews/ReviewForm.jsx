@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaStar } from 'react-icons/fa6';
 import { useAuth } from '../../context/AuthContext';
 
-const ReviewForm = ({ companyName }) => {
+const ReviewForm = ({ companyName, companyId, onReviewSubmitted }) => {
   const { user } = useAuth();
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
@@ -63,8 +63,10 @@ const ReviewForm = ({ companyName }) => {
           review: ''
         });
         setRating(0);
-        // Reload page to see new review
-        window.location.reload();
+        // Trigger callback to refresh reviews
+        if (onReviewSubmitted) {
+          onReviewSubmitted();
+        }
       } else {
         alert(data.message || 'Failed to submit review');
       }
@@ -77,29 +79,9 @@ const ReviewForm = ({ companyName }) => {
   };
 
   return (
-    <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 mt-6">
+    <div className="bg-gray-50 p-6 rounded-xl border border-gray-400 h-full">
       <h3 className="text-xl font-bold text-primary mb-4">Write a Review for {companyName}</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Rating Stars */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">Your Rating</label>
-          <div className="flex gap-1">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                className="text-2xl transition-colors"
-                onClick={() => setRating(star)}
-                onMouseEnter={() => setHover(star)}
-                onMouseLeave={() => setHover(0)}
-              >
-                <FaStar
-                  className={(star <= (hover || rating)) ? "text-secondary" : "text-gray-300"}
-                />
-              </button>
-            ))}
-          </div>
-        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
@@ -135,13 +117,37 @@ const ReviewForm = ({ companyName }) => {
           ></textarea>
         </div>
 
+        {/* Rating Stars */}
+        <div className="flex flex-col gap-2 text-center">
+          <label className="text-sm font-medium text-gray-700">Your Rating</label>
+          <div className="flex gap-1 justify-center">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                className="text-2xl transition-colors"
+                onClick={() => setRating(star)}
+                onMouseEnter={() => setHover(star)}
+                onMouseLeave={() => setHover(0)}
+              >
+                <FaStar
+                  className={(star <= (hover || rating)) ? "text-secondary" : "text-gray-300"}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-center">
         <button
           type="submit"
           disabled={loading}
-          className={`bg-primary text-white font-bold py-3 px-8 rounded-lg transition-colors active:scale-95 ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary/90'}`}
+            className={`bg-primary text-white font-bold w-full py-3 px-8 rounded-lg transition-colors active:scale-95 ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary/90'}`}
         >
           {loading ? 'Submitting...' : 'Submit Review'}
         </button>
+        </div>
+
       </form>
     </div>
   );
