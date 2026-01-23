@@ -215,9 +215,20 @@ const CompanyDetail = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-400 p-8 text-center space-y-6 h-full flex flex-col justify-center">
               <h4 className="text-md font-bold text-primary uppercase tracking-widest">Seal Verification</h4>
               <div className="flex justify-center gap-8 items-center bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-200">
-                <div className="w-24 h-24 bg-white p-2 rounded-lg border border-gray-200">
-                  <div className="w-full h-full bg-[url('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=NiyahVerification')] bg-cover bg-center"></div>
-                </div>
+                <a
+                  href={`/verify/${company._id}`}
+                  className="w-24 h-24 bg-white p-2 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(`/verify/${company._id}`);
+                  }}
+                >
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`${window.location.origin}/verify/${company._id}`)}`}
+                    alt="Scan to Verify"
+                    className="w-full h-full object-cover"
+                  />
+                </a>
                 <div className="w-24 h-24 bg-primary text-white rounded-full flex flex-col items-center justify-center p-2 shadow-lg">
                   <span className="text-[10px] font-bold uppercase leading-tight">Verified</span>
                   <span className="text-[12px] font-black uppercase tracking-tighter">Niya Pact™</span>

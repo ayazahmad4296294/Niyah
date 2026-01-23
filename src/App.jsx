@@ -18,6 +18,7 @@ import Contact from './pages/Contact'
 import AllReviews from './pages/AllReviews'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import CompanyDetail from './pages/CompanyDetail'
+import CompanyVerification from './pages/CompanyVerification'
 import SearchResults from './pages/SearchResults'
 import ScrollToTop from './components/common/ScrollToTop'
 import { AuthProvider } from './context/AuthContext'
@@ -45,6 +46,7 @@ const App = () => {
         <Route path="/reviews" element={<AllReviews />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/company/:companyId" element={<CompanyDetail />} />
+          <Route path="/verify/:companyId" element={<CompanyVerification />} />
           <Route path="/companies/category/:category" element={<SearchResults />} />
           <Route path="/companies/search" element={<SearchResults />} />
       </Routes>
