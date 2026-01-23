@@ -1,18 +1,29 @@
+/**
+ * ReviewForm.jsx - Interactive Feedback Component
+ * Handles the submission of detailed qualitative reviews with star ratings.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { FaStar } from 'react-icons/fa6';
 import { useAuth } from '../../context/AuthContext';
 
 const ReviewForm = ({ companyName, companyId, onReviewSubmitted }) => {
-  const { user } = useAuth();
+  const { user } = useAuth(); // Access global user context for pre-filling
+
+  // Local state for rating and UI hover effects
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     review: ''
   });
 
-  // Pre-fill user data if logged in
+  /**
+   * UX Improvement: Pre-fetch Authenticated Data
+   * If the user is logged in, automatically fill identity fields to reduce friction.
+   */
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
@@ -25,6 +36,10 @@ const ReviewForm = ({ companyName, companyId, onReviewSubmitted }) => {
 
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Submission Handler
+   * Validates JWT presence and POSTs review data to the centralized API.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -44,7 +59,7 @@ const ReviewForm = ({ companyName, companyId, onReviewSubmitted }) => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          companyId: companyId, // Correctly using MongoDB _id
+          companyId: companyId, // Links review to the specific organization
           name: formData.name,
           email: formData.email,
           rating: rating,
@@ -56,14 +71,20 @@ const ReviewForm = ({ companyName, companyId, onReviewSubmitted }) => {
 
       if (data.success) {
         alert('Review submitted successfully!');
-        // Reset form to user defaults
+
+        // Form Cleanup Logic: Resetting textual feedback while preserving identity
         setFormData({
           name: user?.name || '',
           email: user?.email || '',
           review: ''
         });
         setRating(0);
-        // Trigger callback to refresh reviews
+
+        /**
+         * Parent Communication:
+         * Triggers a state refresh in the parent component (e.g., CompanyDetail)
+         * to show the newly added review immediately.
+         */
         if (onReviewSubmitted) {
           onReviewSubmitted();
         }
@@ -82,7 +103,7 @@ const ReviewForm = ({ companyName, companyId, onReviewSubmitted }) => {
     <div className="bg-gray-50 p-6 rounded-xl border border-gray-400 h-full">
       <h3 className="text-xl font-bold text-primary mb-4">Write a Review for {companyName}</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
-
+        {/* Responsive Grid for User Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700">Name</label>
@@ -117,7 +138,7 @@ const ReviewForm = ({ companyName, companyId, onReviewSubmitted }) => {
           ></textarea>
         </div>
 
-        {/* Rating Stars */}
+        {/* Dynamic Star Rating UI */}
         <div className="flex flex-col gap-2 text-center">
           <label className="text-sm font-medium text-gray-700">Your Rating</label>
           <div className="flex gap-1 justify-center">
@@ -147,7 +168,6 @@ const ReviewForm = ({ companyName, companyId, onReviewSubmitted }) => {
           {loading ? 'Submitting...' : 'Submit Review'}
         </button>
         </div>
-
       </form>
     </div>
   );

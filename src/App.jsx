@@ -1,3 +1,9 @@
+/**
+ * App.jsx - Frontend Configuration & Routing
+ * This is the central hub for the React application, managing global providers, 
+ * page-level routing, and external configuration like animations.
+ */
+
 import React, { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
@@ -26,25 +32,42 @@ import { AuthProvider } from './context/AuthContext'
 const App = () => {
 
   return (
+    /**
+     * Provider Wrapping Logic:
+     * - AuthProvider: Manages user session and login state globally.
+     * - CompanyProvider: Distributes the shared company directory data to all child components.
+     * - ScrollToTop: Reset scroll position on every route change for better UX.
+     */
     <AuthProvider>
       <CompanyProvider>
         <ScrollToTop />
       <Routes>
+          {/* Core & Utility Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<AuthPage />} />
         <Route path="/register" element={<AuthPage />} />
         <Route path="/certified-companies" element={<CertifiedCompanies />} />
         <Route path="/new-company" element={<NewCompanyForm />} />
+
+          {/* Trust & Transparency Pages */}
         <Route path="/trust-report" element={<TrustReport />} />
           <Route path="/service-level-agreements" element={<ServiceLevelAgreements />} />
         <Route path="/file-complaint" element={<RateOrComplaint />} />
         <Route path="/blog" element={<Blog />} />
+
+          {/* Certification & Info */}
         <Route path="/get-certified/business" element={<Business />} />
         <Route path="/get-certified/non-profit" element={<NonProfit />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/reviews" element={<AllReviews />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
+          {/* Dynamic & Search Routes
+            - company/:companyId: Detailed profile viewing
+            - verify/:companyId: Accessible via QR code for certification proof
+            - category/:category: Industry-specific filtering
+        */}
         <Route path="/company/:companyId" element={<CompanyDetail />} />
           <Route path="/verify/:companyId" element={<CompanyVerification />} />
           <Route path="/companies/category/:category" element={<SearchResults />} />

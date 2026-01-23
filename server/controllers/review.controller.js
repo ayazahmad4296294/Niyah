@@ -1,14 +1,24 @@
+/**
+ * review.controller.js
+ * Manages user-generated reviews.
+ * Includes logic for paginated fetching and authenticated submissions.
+ */
+
 import Review from '../models/Review.js';
 
-// @desc    Get all reviews
-// @route   GET /api/reviews
-// @access  Public
+/**
+ * @desc    Get all reviews across companies (or filtered by multiple IDs)
+ * @route   GET /api/reviews
+ * @access  Public
+ * @purpose Used primarily for discovery pages or global review sliders.
+ */
 export const getAllReviews = async (req, res) => {
     try {
         const { page = 1, limit = 9, companyIds } = req.query;
         const skip = (parseInt(page) - 1) * parseInt(limit);
 
         const query = {};
+        // If companyIds provided, convert comma-separated string to array for $in query
         if (companyIds) {
             const ids = companyIds.split(',');
             query.companyId = { $in: ids };
@@ -39,13 +49,16 @@ export const getAllReviews = async (req, res) => {
     }
 };
 
-// @desc    Submit a Review
-// @route   POST /api/reviews
-// @access  Private (Authenticated users only)
+/**
+ * @desc    Submit a new Review
+ * @route   POST /api/reviews
+ * @access  Private
+ * @purpose Allows authenticated users to share detailed feedback.
+ */
 export const submitReview = async (req, res) => {
     const { companyId, name, email, rating, reviewText } = req.body;
 
-    // Validate missing fields
+    // Strict validation to ensure data completeness before DB insertion
     if (!companyId || !name || !email || !rating || !reviewText) {
         return res.status(400).json({
             success: false,
@@ -53,7 +66,7 @@ export const submitReview = async (req, res) => {
         });
     }
 
-    // Validate rating range
+    // Business rule: Ratings must stay within the 1-5 star bounds
     if (rating < 1 || rating > 5) {
         return res.status(400).json({
             success: false,
@@ -63,7 +76,7 @@ export const submitReview = async (req, res) => {
 
     try {
         const newReview = new Review({
-            userId: req.user._id, // From protect middleware
+            userId: req.user._id, // User ID is injected by the 'protect' middleware
             companyId,
             name,
             email,
@@ -85,9 +98,13 @@ export const submitReview = async (req, res) => {
         });
     }
 };
-// @desc    Get reviews for a specific company
-// @route   GET /api/reviews/:companyId
-// @access  Public
+
+/**
+ * @desc    Get reviews for a specific company
+ * @route   GET /api/reviews/:companyId
+ * @access  Public
+ * @purpose Populates the 'Reviews' section on the Company Detail page.
+ */
 export const getCompanyReviews = async (req, res) => {
     const { companyId } = req.params;
     const page = parseInt(req.query.page) || 1;
@@ -95,13 +112,14 @@ export const getCompanyReviews = async (req, res) => {
     const skip = (page - 1) * limit;
 
     try {
+        // Regex search allows for case-insensitive matching of company IDs/Names
         const query = {
             companyId: { $regex: new RegExp(`^${companyId}$`, 'i') }
         };
 
         const totalItems = await Review.countDocuments(query);
         const reviews = await Review.find(query)
-            .sort({ createdAt: -1 })
+            .sort({ createdAt: -1 }) // Sort by newest first
             .skip(skip)
             .limit(limit);
 

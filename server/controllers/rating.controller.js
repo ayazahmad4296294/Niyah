@@ -1,13 +1,22 @@
+/**
+ * rating.controller.js
+ * Handles lightweight star ratings for companies.
+ * This separate controller allows for quick numerical feedback without full reviews.
+ */
+
 import Rating from '../models/Rating.js';
 
-// @desc    Submit a Rating for a company
-// @route   POST /api/ratings
-// @access  Private
+/**
+ * @desc    Submit a Rating for a company
+ * @route   POST /api/ratings
+ * @access  Private
+ * @purpose Collects quantitative trust data for score calculation.
+ */
 export const submitRating = async (req, res) => {
     try {
         const { companyId, fullName, email, rating, message } = req.body;
 
-        // Validation
+        // Basic validation: ensures core data points are present
         if (!companyId || !fullName || !email || !rating) {
             return res.status(400).json({
                 success: false,
@@ -15,6 +24,7 @@ export const submitRating = async (req, res) => {
             });
         }
 
+        // Integrity check: prevents automated or malicious out-of-bounds ratings
         if (rating < 1 || rating > 5) {
             return res.status(400).json({
                 success: false,
@@ -23,7 +33,7 @@ export const submitRating = async (req, res) => {
         }
 
         const newRating = new Rating({
-            userId: req.user._id, // From auth middleware
+            userId: req.user._id, // Extracted from decoded JWT by the auth middleware
             companyId,
             fullName,
             email,

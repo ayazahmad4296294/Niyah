@@ -1,3 +1,9 @@
+/**
+ * SearchResults.jsx - Multi-Entity Search Engine
+ * This page aggregates data across different resources (Companies and Reviews)
+ * based on category filters or textual search queries.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/common/Navbar';
@@ -8,16 +14,18 @@ import ReviewCard from '../components/reviews/ReviewCard';
 import axios from 'axios';
 
 const SearchResults = () => {
+    // Parameter extraction from both path (:category) and query (?q=...)
     const { category } = useParams();
     const [searchParams] = useSearchParams();
     const searchQuery = searchParams.get('q');
 
+    // Aggregate Data State
     const [companies, setCompanies] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Pagination states
+    // Independent Pagination Management for two different datasets
     const [companyPage, setCompanyPage] = useState(1);
     const [companyTotalPages, setCompanyTotalPages] = useState(1);
     const [reviewPage, setReviewPage] = useState(1);
@@ -26,11 +34,16 @@ const SearchResults = () => {
     const companyLimit = 12;
     const reviewLimit = 9;
 
+    /**
+     * Holistic Search Orchestration
+     * 1. Fetches companies matching the filter/query.
+     * 2. Uses the resulting IDs to fetch contextual reviews, ensuring SEO-friendly relevance.
+     */
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                // 1. Fetch Companies
+                // Construct dynamic URL for Company filtering
                 let companyUrl = `/api/companies?page=${companyPage}&limit=${companyLimit}`;
                 if (category) companyUrl += `&category=${encodeURIComponent(category)}`;
                 if (searchQuery) companyUrl += `&search=${encodeURIComponent(searchQuery)}`;
@@ -40,7 +53,10 @@ const SearchResults = () => {
                 setCompanies(fetchedCompanies);
                 setCompanyTotalPages(compRes.data.pagination.totalPages);
 
-                // 2. Fetch Related Reviews
+                /**
+                 * Contextual Review Fetching:
+                 * If companies are found, pull their most recent reviews to show on the same page.
+                 */
                 if (fetchedCompanies.length > 0) {
                     const companyIds = fetchedCompanies.map(c => c._id).join(',');
                     const reviewRes = await axios.get(`/api/reviews?companyIds=${companyIds}&page=${reviewPage}&limit=${reviewLimit}`);
@@ -65,7 +81,7 @@ const SearchResults = () => {
     const handleCompanyPageChange = (page) => {
         if (page >= 1 && page <= companyTotalPages) {
             setCompanyPage(page);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Visual reset for user
         }
     };
 
@@ -75,14 +91,13 @@ const SearchResults = () => {
         }
     };
 
-    const sectionTitleClass = "text-2xl md:text-3xl font-bold text-primary border-l-4 border-secondary pl-4 mb-8";
-
     return (
         <div className='w-full bg-gray-50'>
             <Navbar />
             <Header />
 
             <main className='max-w-7xl mx-auto py-16 px-6'>
+                {/* Dynamic Header Display based on search intent */}
                 <h1 className='text-3xl font-bold text-primary mb-10'>
                     {category ? `Category: ${category}` : searchQuery ? `Search Results for "${searchQuery}"` : "All Companies"}
                 </h1>
@@ -95,9 +110,8 @@ const SearchResults = () => {
                     <div className="text-center py-20 text-red-500 font-bold">{error}</div>
                 ) : (
                     <>
-                        {/* Companies Section */}
-                        <section className='mb-20'>
-                            {/* <h2 className={sectionTitleClass}>Companies</h2> */}
+                                {/* Directory Section: Grid of Company Cards */}
+                                <section className='mb-20'>
                             {companies.length > 0 ? (
                                 <>
                                     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
@@ -106,7 +120,7 @@ const SearchResults = () => {
                                         ))}
                                     </div>
 
-                                    {/* Company Pagination */}
+                                            {/* Traditional Page-based Navigation */}
                                     {companyTotalPages > 1 && (
                                         <div className='flex items-center justify-center gap-2 mt-12'>
                                             <button onClick={() => handleCompanyPageChange(companyPage - 1)} disabled={companyPage === 1} className="px-4 py-2 border rounded disabled:opacity-50">Prev</button>
@@ -120,36 +134,7 @@ const SearchResults = () => {
                             ) : (
                                 <p className='text-gray-500'>No companies found matching your criteria.</p>
                             )}
-                        </section>
-
-                        {/* Reviews Section */}
-                        {/* {companies.length > 0 && (
-                            <section>
-                                <h2 className={sectionTitleClass}>Related Reviews</h2>
-                                {reviews.length > 0 ? (
-                                    <>
-                                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-                                            {reviews.map((review, index) => (
-                                                <ReviewCard key={review._id} review={review} index={index} />
-                                            ))}
-                                        </div>
-
-                                         Review Pagination 
-                                        {reviewTotalPages > 1 && (
-                                            <div className='flex items-center justify-center gap-2 mt-12'>
-                                                <button onClick={() => handleReviewPageChange(reviewPage - 1)} disabled={reviewPage === 1} className="px-4 py-2 border rounded disabled:opacity-50">Prev</button>
-                                                {[...Array(reviewTotalPages)].map((_, i) => (
-                                                    <button key={i} onClick={() => handleReviewPageChange(i + 1)} className={`w-10 h-10 rounded ${reviewPage === i + 1 ? 'bg-primary text-white' : 'bg-white text-primary border'}`}>{i + 1}</button>
-                                                ))}
-                                                <button onClick={() => handleReviewPageChange(reviewPage + 1)} disabled={reviewPage === reviewTotalPages} className="px-4 py-2 border rounded disabled:opacity-50">Next</button>
-                                            </div>
-                                        )}
-                                    </>
-                                ) : (
-                                    <p className='text-gray-500'>No reviews found for these companies.</p>
-                                )}
-                            </section>
-                        )} */}
+                                </section>
                     </>
                 )}
             </main>

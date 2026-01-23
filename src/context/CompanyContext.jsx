@@ -1,8 +1,19 @@
+/**
+ * CompanyContext.jsx - Global Shared State (Directory)
+ * This context fetches and distributes the master list of organizations.
+ * It eliminates the need for redundant API calls across multiple discovery pages.
+ */
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 const CompanyContext = createContext();
 
+/**
+ * Custom Hook: useCompany
+ * Simple interface for consumers to access the directory data, 
+ * loading states, and error messages.
+ */
 export const useCompany = () => {
     const context = useContext(CompanyContext);
     if (!context) {
@@ -11,6 +22,10 @@ export const useCompany = () => {
     return context;
 };
 
+/**
+ * Provider Component
+ * Fetches the baseline company dataset on initial mount.
+ */
 export const CompanyProvider = ({ children }) => {
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -19,15 +34,12 @@ export const CompanyProvider = ({ children }) => {
     useEffect(() => {
         const fetchCompanies = async () => {
             try {
-                // Adjust URL based on your env or proxy setup. Assuming vite proxy or absolute URL for now.
-                // If vite proxy is set to /api -> http://localhost:5000, then just /api/companies works.
-                // Using full URL for safety in dev if proxy not confirmed, but typically relative is better with proxy.
-                // Let's assume standard Vite proxy setup or cors is enabled on backend (it is).
+                // Baseline fetch: retrieves the first page of companies for the directory
                 const response = await axios.get('/api/companies');
                 if (response.data.success) {
                     setCompanies(response.data.data);
                 } else {
-                    setCompanies(response.data); // Fallback if data is not nested as expected
+                    setCompanies(response.data); // Fallback structure handling
                 }
                 setLoading(false);
             } catch (err) {

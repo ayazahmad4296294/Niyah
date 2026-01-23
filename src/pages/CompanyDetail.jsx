@@ -1,3 +1,9 @@
+/**
+ * CompanyDetail.jsx - Detailed Organization Profile
+ * This page serves as a landing page for individual companies. 
+ * It manages reviews, ratings, and displays dynamic verification metadata.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -9,10 +15,13 @@ import { FaStar, FaUser, FaCircleCheck } from 'react-icons/fa6';
 import ReviewForm from '../components/reviews/ReviewForm';
 
 const CompanyDetail = () => {
+  // Extract 'companyId' from URL to fetch context-specific data
   const { companyId } = useParams();
-  const { companies } = useCompany();
-  const { user } = useAuth(); // Get user from AuthContext
-  const navigate = useNavigate(); // Use navigate for redirection
+  const { companies } = useCompany(); // Get global company list
+  const { user } = useAuth(); // Monitor auth state for restricted actions (reviews)
+  const navigate = useNavigate();
+
+  // Local state for Managing Review Interactions
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [companyReviews, setCompanyReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
@@ -20,24 +29,26 @@ const CompanyDetail = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showAllReviews, setShowAllReviews] = useState(false);
-  const [limit, setLimit] = useState(4); // Default to 4 reviews initially
+  const [limit, setLimit] = useState(4); 
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Find the company based on the dynamic ID
+  // Sync current selection with the centralized CompanyContext
   const company = companies.find((c) => c._id === companyId);
 
-  // Move useEffect UP so it is not conditional
+  /**
+   * Data Fetching: Reviews
+   * Fetches paginated reviews whenever 'companyId', 'page', or 'limit' changes.
+   * 'refreshTrigger' allows manual re-fetching after a successful submission.
+   */
   useEffect(() => {
-    if (!company?._id) return; // Guard clause inside the effect
+    if (!company?._id) return; 
 
     const fetchReviews = async () => {
       setLoadingReviews(true);
       try {
-        // Use the new paginated reviews endpoint
         const response = await fetch(`/api/companies/${company._id}/reviews?page=${currentPage}&limit=${limit}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch reviews');
-        }
+        if (!response.ok) throw new Error('Failed to fetch reviews');
+
         const data = await response.json();
         if (data.success) {
           setCompanyReviews(data.data);
@@ -56,12 +67,19 @@ const CompanyDetail = () => {
     fetchReviews();
   }, [company?._id, currentPage, limit, refreshTrigger]);
 
+  /**
+   * Page Navigation Handlers
+   */
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
 
+  /**
+   * Auth Guard: Review Submission
+   * Blocks non-logged-in users from opening the review form.
+   */
   const handleReviewClick = () => {
     if (!user) {
       if (window.confirm("You must be logged in to write a review. Go to login page?")) {
@@ -72,6 +90,7 @@ const CompanyDetail = () => {
     setIsReviewFormOpen(!isReviewFormOpen);
   };
 
+  // 404 Guard: Handles invalid or expired company IDs
   if (!company) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -93,14 +112,11 @@ const CompanyDetail = () => {
 
       <div className="grow pt-32 pb-20 px-6 max-w-6xl mx-auto w-full space-y-16">
 
-        {/* Section 1: Overview & Map (60/40 Split) */}
+        {/* Layout Overview: 60/40 Split between static details and map */}
         <div className="flex flex-col lg:flex-row gap-10 items-stretch">
-
-          {/* Left (50%): Company Overview */}
           <div className="w-full lg:w-[60%]">
             <section className="bg-white rounded-2xl shadow-sm p-8 md:p-10 border border-gray-400 h-full">
               <h2 className="text-2xl font-bold text-primary mb-8 border-b border-gray-300 pb-4">Overview</h2>
-
               <div className="space-y-6">
                 <div>
                   <h1 className="text-4xl font-bold text-black mb-2">{company.name}</h1>
@@ -108,11 +124,11 @@ const CompanyDetail = () => {
                     {company.category}
                   </span>
                 </div>
-
                 <p className="text-lg text-gray-600 leading-relaxed">
                   {company.description || "No description provided."}
                 </p>
 
+                {/* Contact Information Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 mt-6 border-t border-gray-50">
                   <div className="flex items-center gap-4 group">
                     <div className="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
@@ -123,7 +139,6 @@ const CompanyDetail = () => {
                       <p className="font-medium text-primary">{company.email || "Not provided"}</p>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-4 group">
                     <div className="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
                       <HiOutlineGlobeAlt size={22} />
@@ -158,10 +173,10 @@ const CompanyDetail = () => {
             </section>
           </div>
 
-          {/* Right (50%): Company Location Map */}
           <div className="w-full lg:w-[40%]">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-400 p-4 overflow-hidden h-full flex flex-col">
               <div className="grow w-full bg-gray-100 rounded-xl relative flex items-center justify-center overflow-hidden min-h-[300px]">
+                {/* Embed Map Integration for visual physical location validation */}
                 <iframe
                   title="Map Location"
                   width="100%"
@@ -177,14 +192,11 @@ const CompanyDetail = () => {
           </div>
         </div>
 
-        {/* Section 2: Verification Area (50/50 Split) */}
+        {/* Verification Area: Displays trust score and active QR code for real-time validation */}
         <div className="flex flex-col lg:flex-row gap-8 items-stretch">
-
-          {/* Left (50%): Verification Card */}
           <div className="w-full lg:w-1/2">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-400 p-8 flex flex-col items-center text-center h-full justify-center">
               <div className="w-20 h-20 bg-primary/5 rounded-2xl p-4 mb-6 flex items-center justify-center border border-primary/5">
-                {/* Fallback to text if no image (since we don't store images in DB) */}
                 <span className="text-3xl font-bold text-primary">{company.name.charAt(0)}</span>
               </div>
               <h3 className="text-xl font-bold text-black mb-1">{company.name}</h3>
@@ -210,10 +222,10 @@ const CompanyDetail = () => {
             </div>
           </div>
 
-          {/* Right (50%): Seal Verification Block */}
           <div className="w-full lg:w-1/2">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-400 p-8 text-center space-y-6 h-full flex flex-col justify-center">
               <h4 className="text-md font-bold text-primary uppercase tracking-widest">Seal Verification</h4>
+              {/* Dynamic QR Block: Encourages mobile scanning for decentral-style proof */}
               <div className="flex justify-center gap-8 items-center bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-200">
                 <a
                   href={`/verify/${company._id}`}
@@ -240,7 +252,7 @@ const CompanyDetail = () => {
           </div>
         </div>
 
-        {/* REVIEWS SECTION (Full Width) */}
+        {/* Reviews Section: Dynamically rendering community feedback */}
         <section id="reviews">
           <div className="flex items-center justify-between mb-8 text-center">
             <h2 className="text-3xl font-bold text-primary w-full md:text-left">Company Reviews</h2>
@@ -279,13 +291,13 @@ const CompanyDetail = () => {
                     ))}
                   </div>
 
-                  {/* See All Button */}
+                  {/* Progressive Disclosure: 'See All' expands the review limits */}
                   {!showAllReviews && totalPages > 1 && (
                     <div className='flex items-center justify-center mt-8'>
                       <button
                         onClick={() => {
                           setShowAllReviews(true);
-                          setLimit(9); // Increase limit or 100 to show more, logic handles in useEffect
+                          setLimit(9); 
                         }}
                         className="bg-secondary text-primary font-bold py-2 px-6 rounded-lg shadow hover:bg-secondary/90 transition-colors"
                       >
@@ -294,7 +306,7 @@ const CompanyDetail = () => {
                     </div>
                   )}
 
-                  {/* Pagination Controls - Only show if showing all reviews */}
+                  {/* Standard Pagination Controls */}
                   {showAllReviews && totalPages > 1 && (
                     <div className='flex items-center justify-center gap-2 mt-8'>
                       <button
@@ -331,7 +343,6 @@ const CompanyDetail = () => {
             </div>
           )}
 
-          {/* Review Action Buttons BELOW the grid */}
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
             <button
               onClick={handleReviewClick}
@@ -342,25 +353,24 @@ const CompanyDetail = () => {
           </div>
         </section>
 
-        {/* Combined Container for Form and CTA */}
+        {/* Dynamic Interactive Layout: Side-by-side arrangement when Review Form is active */}
         <div className={`flex flex-col ${isReviewFormOpen ? 'lg:flex-row items-stretch' : ''} gap-8`}>
 
-          {/* Review Form Section (Left Side when open) */}
           {isReviewFormOpen && (
             <div className="w-full lg:w-1/2 transition-all duration-300 ease-in-out">
               <ReviewForm
                 companyName={company.name}
                 companyId={company._id}
                 onReviewSubmitted={() => {
-                  setIsReviewFormOpen(false);
-                  setCurrentPage(1);
-                  setRefreshTrigger(prev => prev + 1);
+                  setIsReviewFormOpen(false); // Close form on success
+                  setCurrentPage(1); // Reset to first page
+                  setRefreshTrigger(prev => prev + 1); // Trigger re-fetch
                 }}
               />
             </div>
           )}
 
-          {/* RATE & COMPLAINT CTA (Right Side when form is open, Full Width otherwise) */}
+          {/* Call to Action: Direct links for deeper engagement (Complaints/Ratings) */}
           <section className={`${isReviewFormOpen ? 'lg:w-1/2' : 'w-full'} bg-primary p-8 md:p-12 rounded-3xl shadow-xl flex flex-col items-center justify-center gap-8 border-4 border-secondary/10 transition-all duration-300`}>
 
             <div className="text-white text-center">

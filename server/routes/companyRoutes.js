@@ -1,10 +1,16 @@
+/**
+ * companyRoutes.js
+ * Handles company-related data operations including listing, searching, 
+ * and detailed verification retrieval.
+ */
+
 import express from 'express';
 import Company from '../models/Company.js';
 import { getCompanyReviews } from '../controllers/review.controller.js';
 
 const router = express.Router();
 
-// Dummy data for seeding (from src/data/companyData.js)
+// Static seed data used for system initialization and testing.
 const companiesData = [
     {
         category: "Technology",
@@ -18,6 +24,8 @@ const companiesData = [
         verificationStatus: "Verified",
         trustScore: 4.8
     },
+    // ... rest of the dummy companies
+    // (Preserving original logic as requested)
     {
         category: "Technology",
         name: "Levine and Lancaster LLC",
@@ -152,16 +160,14 @@ const companiesData = [
     }
 ];
 
-// @route   POST /api/companies/seed
-// @desc    Seed companies data
-// @access  Public (Dev only)
+/**
+ * @route   POST /api/companies/seed
+ * @desc    Initializes the database with sample companies.
+ *          Uses an upsert logic to avoid duplication based on company names.
+ */
 router.post('/seed', async (req, res) => {
     try {
-        // Clear existing companies to prevent duplicates during testing/dev
-        // OR verify existence one by one. For this task, let's just loop and upsert
-
         let createdCount = 0;
-
         for (const company of companiesData) {
             const exists = await Company.findOne({ name: company.name });
             if (!exists) {
@@ -169,7 +175,6 @@ router.post('/seed', async (req, res) => {
                 createdCount++;
             }
         }
-
         res.json({ message: `Seeding complete. Added ${createdCount} new companies.` });
     } catch (error) {
         console.error('Seed error:', error);
@@ -177,14 +182,17 @@ router.post('/seed', async (req, res) => {
     }
 });
 
-// @route   GET /api/companies
-// @desc    Get all companies with pagination
-// @access  Public
+/**
+ * @route   GET /api/companies
+ * @desc    Retrieves a paginated list of companies.
+ *          Supports filtering by 'search' (name regex) and 'category'.
+ */
 router.get('/', async (req, res) => {
     try {
         const { page = 1, limit = 12, search, category } = req.query;
         const skip = (parseInt(page) - 1) * parseInt(limit);
 
+        // Build conditional query based on URL parameters
         const query = {};
         if (search) {
             query.name = { $regex: search, $options: 'i' };
@@ -195,7 +203,7 @@ router.get('/', async (req, res) => {
 
         const totalItems = await Company.countDocuments(query);
         const companies = await Company.find(query)
-            .sort({ createdAt: -1 })
+            .sort({ createdAt: -1 }) // Newest companies first
             .skip(skip)
             .limit(parseInt(limit));
 
@@ -215,20 +223,26 @@ router.get('/', async (req, res) => {
     }
 });
 
-// @route   GET /api/companies/:id/reviews
-// @desc    Get reviews for a specific company with pagination
-// @access  Public
+/**
+ * @route   GET /api/companies/:companyId/reviews
+ * @desc    Direct link to fetch reviews associated with a specific company.
+ */
 router.get('/:companyId/reviews', getCompanyReviews);
 
-// @route   GET /api/companies/:id
-// @desc    Get single company by ID
-// @access  Public
+/**
+ * @route   GET /api/companies/:id
+ * @desc    Retrieves a single company profile.
+ *          Injects dynamic verification metadata (Id, Blockchain status, etc.)
+ *          requested by the front-end verification page.
+ */
 router.get('/:id', async (req, res) => {
     try {
         const company = await Company.findById(req.params.id);
         if (!company) {
             return res.status(404).json({ message: 'Company not found' });
         }
+
+        // Enrich the data with dynamic verification metadata for the QR flow
         res.json({
             ...company.toObject(),
             verificationId: `NY-${company._id.toString().substring(0, 8).toUpperCase()}`,
